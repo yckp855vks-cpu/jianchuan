@@ -177,10 +177,10 @@ The four packages are attached to this repository's **Releases** page:
 
 | Package | Platform | What it does |
 |---|---|---|
-| `简传Lite-电脑版-*.exe` | Windows x64 | Desktop app — double-click, no Python required |
-| `简传Lite-安卓版-*.apk` | Android 7.0+ (arm64) | Phone app: transfer / clipboard / server / TV source |
-| `媒体库播放器-*.apk` | Android TV / projector (armv7) | Big-screen player, finds sources on the LAN |
-| `MediaShare-电脑版.exe` | Windows x64 | PC as a media server, plus the GUI console |
+| `JianChuan-Windows-*.exe` | Windows x64 | Desktop app — double-click, no Python required |
+| `JianChuan-Android-*.apk` | Android 7.0+ (arm64) | Phone app: transfer / clipboard / server / TV source |
+| `JianChuan-TvPlayer-*.apk` | Android TV / projector (armv7) | Big-screen player, finds sources on the LAN |
+| `MediaShare-Windows.exe` | Windows x64 | PC as a media server, plus the GUI console |
 
 ### From source
 

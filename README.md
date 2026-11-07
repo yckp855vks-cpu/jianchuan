@@ -224,10 +224,10 @@ Wi-Fi 掉了也不至于断干净 —— 还有一条 BLE 蓝牙通道兜着，�
 
 | 包 | 平台 | 干什么 |
 |---|---|---|
-| `简传Lite-电脑版-*.exe` | Windows x64 | 电脑端主程序，双击即用，不用装 Python |
-| `简传Lite-安卓版-*.apk` | Android 7.0+ (arm64) | 手机端：互传 / 剪贴板 / 当服务端 / 给电视供片 |
-| `媒体库播放器-*.apk` | Android TV / 投影仪 (armv7) | 大屏播放器，自己扫局域网找片源 |
-| `MediaShare-电脑版.exe` | Windows x64 | 电脑当媒体服务器 + 图形控制台 |
+| `JianChuan-Windows-*.exe` | Windows x64 | 电脑端主程序，双击即用，不用装 Python |
+| `JianChuan-Android-*.apk` | Android 7.0+ (arm64) | 手机端：互传 / 剪贴板 / 当服务端 / 给电视供片 |
+| `JianChuan-TvPlayer-*.apk` | Android TV / 投影仪 (armv7) | 大屏播放器，自己扫局域网找片源 |
+| `MediaShare-Windows.exe` | Windows x64 | 电脑当媒体服务器 + 图形控制台 |
 
 > Prebuilt binaries are attached to **Releases** — no Python, no Android Studio needed.
 
