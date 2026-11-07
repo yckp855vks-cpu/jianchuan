@@ -171,6 +171,19 @@ starts/stops the server, shows live logs and a QR code.
 
 ## 7. Quick start
 
+### Grab a prebuilt binary
+
+The four packages are attached to this repository's **Releases** page:
+
+| Package | Platform | What it does |
+|---|---|---|
+| `简传Lite-电脑版-*.exe` | Windows x64 | Desktop app — double-click, no Python required |
+| `简传Lite-安卓版-*.apk` | Android 7.0+ (arm64) | Phone app: transfer / clipboard / server / TV source |
+| `媒体库播放器-*.apk` | Android TV / projector (armv7) | Big-screen player, finds sources on the LAN |
+| `MediaShare-电脑版.exe` | Windows x64 | PC as a media server, plus the GUI console |
+
+### From source
+
 ```bash
 # PC side — Python 3.9+, no third-party packages
 python pc/server.py                 # port 8787, opens the browser
