@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 连接抽屉的卡片底色：只有上两角圆，贴住屏幕底部。
+     实际颜色由 applyPalette() 按主题刷上来，这里给晨雾的初值。 -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="#FFFFFF" />
+    <corners
+        android:topLeftRadius="18dp"
+        android:topRightRadius="18dp" />
+</shape>

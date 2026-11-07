@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 播放器：视频铺满，控件压在上面，点画面淡入淡出。
+     控件全部用文字而不是图标：项目里没有 play/pause 图标资源，
+     硬凑一个自绘图标不如几个字清楚，也省得再补一堆 drawable。 -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/p_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#000000">
+
+    <org.videolan.libvlc.util.VLCVideoLayout
+        android:id="@+id/p_video"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <!-- 中间的播放/暂停大图标，暂停时常驻 -->
+    <TextView
+        android:id="@+id/p_bigplay"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:background="@drawable/player_pill"
+        android:gravity="center"
+        android:paddingStart="26dp"
+        android:paddingTop="18dp"
+        android:paddingEnd="26dp"
+        android:paddingBottom="18dp"
+        android:text="▶"
+        android:textColor="#FFFFFF"
+        android:textSize="34sp"
+        android:visibility="gone" />
+
+    <LinearLayout
+        android:id="@+id/p_top"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top"
+        android:background="@drawable/player_scrim_top"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="4dp"
+        android:paddingTop="6dp"
+        android:paddingEnd="8dp"
+        android:paddingBottom="18dp">
+
+        <ImageButton
+            android:id="@+id/p_back"
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="返回"
+            android:src="@drawable/ic_back"
+            android:tint="#FFFFFF" />
+
+        <TextView
+            android:id="@+id/p_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:ellipsize="middle"
+            android:paddingStart="2dp"
+            android:singleLine="true"
+            android:textColor="#FFFFFF"
+            android:textSize="13.5sp" />
+
+        <TextView
+            android:id="@+id/p_sub"
+            style="@style/PlayerPill"
+            android:text="字幕" />
+
+        <TextView
+            android:id="@+id/p_aud"
+            style="@style/PlayerPill"
+            android:text="音轨" />
+
+        <TextView
+            android:id="@+id/p_list"
+            style="@style/PlayerPill"
+            android:text="选集" />
+
+        <TextView
+            android:id="@+id/p_share"
+            style="@style/PlayerPill"
+            android:text="地址" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/p_bottom"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:background="@drawable/player_scrim_bottom"
+        android:orientation="vertical"
+        android:paddingStart="12dp"
+        android:paddingTop="26dp"
+        android:paddingEnd="12dp"
+        android:paddingBottom="8dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/p_cur"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minWidth="46dp"
+                android:text="00:00"
+                android:textColor="#FFFFFF"
+                android:textSize="11.5sp" />
+
+            <SeekBar
+                android:id="@+id/p_seek"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:max="1000"
+                android:paddingStart="4dp"
+                android:paddingEnd="4dp"
+                android:progressBackgroundTint="#4DFFFFFF"
+                android:progressTint="#FFFFFF"
+                android:thumbTint="#FFFFFF" />
+
+            <TextView
+                android:id="@+id/p_total"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="end"
+                android:minWidth="46dp"
+                android:text="00:00"
+                android:textColor="#FFFFFF"
+                android:textSize="11.5sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingTop="2dp">
+
+            <TextView
+                android:id="@+id/p_back10"
+                style="@style/PlayerPill"
+                android:text="-10s" />
+
+            <TextView
+                android:id="@+id/p_play"
+                style="@style/PlayerPill"
+                android:layout_width="wrap_content"
+                android:layout_height="34dp"
+                android:paddingStart="20dp"
+                android:paddingEnd="20dp"
+                android:text="▶"
+                android:textSize="15sp" />
+
+            <TextView
+                android:id="@+id/p_fwd10"
+                style="@style/PlayerPill"
+                android:text="+10s" />
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_weight="1" />
+
+            <TextView
+                android:id="@+id/p_rate"
+                style="@style/PlayerPill"
+                android:text="1.0×" />
+
+            <TextView
+                android:id="@+id/p_dl"
+                style="@style/PlayerPill"
+                android:text="下载" />
+        </LinearLayout>
+    </LinearLayout>
+</FrameLayout>

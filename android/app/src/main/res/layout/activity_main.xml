@@ -1,0 +1,603 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 外层 FrameLayout 只为一件事：让下载进度卡片能浮在 WebView 上面 -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/jc_topbar">
+
+<LinearLayout
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- ============ 顶部：两行（原来三行，压掉一行给聊天区） ============ -->
+    <LinearLayout
+        android:id="@+id/top_bar"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/jc_topbar"
+        android:paddingStart="14dp"
+        android:paddingEnd="10dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="9dp">
+
+        <!-- 行 1：品牌 + 连接状态 + 两个圆钮 -->
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:id="@+id/brand_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="简传 Lite"
+                android:textColor="@color/jc_text"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+
+            <View
+                android:id="@+id/conn_dot"
+                android:layout_width="6dp"
+                android:layout_height="6dp"
+                android:layout_marginStart="7dp"
+                android:background="@drawable/dot" />
+
+            <TextView
+                android:id="@+id/status"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="5dp"
+                android:text="正在初始化…"
+                android:textColor="@color/jc_text2"
+                android:textSize="11sp"
+                android:maxLines="1"
+                android:ellipsize="end" />
+
+            <ImageButton
+                android:id="@+id/theme_btn"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:background="@drawable/round_btn"
+                android:src="@drawable/ic_brush"
+                android:scaleType="centerInside"
+                android:contentDescription="切换主题" />
+
+            <ImageButton
+                android:id="@+id/more_btn"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_marginStart="6dp"
+                android:background="@drawable/round_btn"
+                android:src="@drawable/ic_settings"
+                android:scaleType="centerInside"
+                android:contentDescription="设置" />
+        </LinearLayout>
+
+        <!-- 行 2：公网 / 服务端 两个图标胶囊 + 剪贴板状态 -->
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:gravity="center_vertical">
+
+            <!-- 图标 + 文字。原来只有一个 16dp 图标、文字为空，用户根本不知道是干什么的。
+                 文字由 stylePill() 按状态改写（服务端 / 接收中 / 公网 / 公网已开）。 -->
+            <CheckBox
+                android:id="@+id/net_switch"
+                android:layout_width="wrap_content"
+                android:layout_height="26dp"
+                android:button="@null"
+                android:background="@drawable/pill_idle"
+                android:drawableStart="@drawable/ic_globe"
+                android:drawableTint="@color/pill_icon"
+                android:drawablePadding="4dp"
+                android:gravity="center"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
+                android:minWidth="0dp"
+                android:minHeight="0dp"
+                android:includeFontPadding="false"
+                android:maxLines="1"
+                android:text="公网"
+                android:textColor="@color/pill_text"
+                android:textSize="11sp"
+                android:contentDescription="公网访问" />
+
+            <CheckBox
+                android:id="@+id/server_switch"
+                android:layout_width="wrap_content"
+                android:layout_height="26dp"
+                android:layout_marginStart="6dp"
+                android:button="@null"
+                android:background="@drawable/pill_idle"
+                android:drawableStart="@drawable/ic_server"
+                android:drawableTint="@color/pill_icon"
+                android:drawablePadding="4dp"
+                android:gravity="center"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
+                android:minWidth="0dp"
+                android:minHeight="0dp"
+                android:includeFontPadding="false"
+                android:maxLines="1"
+                android:text="服务端"
+                android:textColor="@color/pill_text"
+                android:textSize="11sp"
+                android:contentDescription="开启服务端" />
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_weight="1" />
+
+            <View
+                android:id="@+id/clip_dot"
+                android:layout_width="5dp"
+                android:layout_height="5dp"
+                android:layout_marginEnd="5dp"
+                android:background="@drawable/dot" />
+
+            <TextView
+                android:id="@+id/clip_status"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="剪贴板自动同步中"
+                android:textColor="@color/jc_text3"
+                android:textSize="10.5sp"
+                android:maxLines="1"
+                android:ellipsize="end" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <WebView
+        android:id="@+id/webview"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:visibility="gone" />
+
+    <!-- 未连接时的状态条（原来这里是「输入框 + 两个大按钮 + 三行说明」顶在底部，
+         一旦弹出来就没有任何收起入口，把输入框整个挤掉）。
+         现在只剩一行可点的字，点了才滑出下面的 conn_drawer。 -->
+    <LinearLayout
+        android:id="@+id/manual_box"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingStart="14dp"
+        android:paddingEnd="14dp"
+        android:paddingTop="9dp"
+        android:paddingBottom="9dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:background="?attr/selectableItemBackground"
+        android:visibility="gone">
+
+        <View
+            android:id="@+id/strip_dot"
+            android:layout_width="6dp"
+            android:layout_height="6dp"
+            android:background="@drawable/dot" />
+
+        <TextView
+            android:id="@+id/strip_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="6dp"
+            android:text="未连接"
+            android:textColor="@color/jc_text2"
+            android:textSize="11sp"
+            android:maxLines="1" />
+
+        <TextView
+            android:id="@+id/strip_action"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:text="· 点这里连接"
+            android:textColor="@color/jc_brand"
+            android:textSize="11sp"
+            android:maxLines="1" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="1" />
+
+        <TextView
+            android:id="@+id/strip_hint"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:textColor="@color/jc_text3"
+            android:textSize="10.5sp"
+            android:maxLines="1"
+            android:ellipsize="end" />
+    </LinearLayout>
+
+    <!-- 服务端模式：手机当服务器，别人扫码或输网址把文件传给我 -->
+    <ScrollView
+        android:id="@+id/server_box"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:fillViewport="true"
+        android:visibility="gone">
+
+        <LinearLayout
+            android:id="@+id/server_inner"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingStart="18dp"
+            android:paddingEnd="18dp"
+            android:paddingTop="18dp"
+            android:paddingBottom="22dp">
+
+            <!-- 状态：点 + 结论。原来写「服务端模式已开启」是在解释机制，改成说结果 -->
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center">
+
+                <View
+                    android:id="@+id/srv_dot"
+                    android:layout_width="7dp"
+                    android:layout_height="7dp"
+                    android:background="@drawable/dot" />
+
+                <TextView
+                    android:id="@+id/srv_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="6dp"
+                    android:text="手机正在接文件"
+                    android:textColor="@color/jc_ok"
+                    android:textSize="13sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/srv_sub"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:gravity="center"
+                android:text="别人扫码或输网址就能传给你"
+                android:textColor="@color/jc_text3"
+                android:textSize="11sp" />
+
+            <!-- 二维码：放进白色圆角卡里，比原来一块黑图漂着稳 -->
+            <LinearLayout
+                android:id="@+id/qr_card"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="14dp"
+                android:background="@drawable/qr_card_bg"
+                android:padding="10dp">
+
+                <ImageView
+                    android:id="@+id/qr_image"
+                    android:layout_width="150dp"
+                    android:layout_height="150dp"
+                    android:background="#FFFFFF"
+                    android:contentDescription="二维码" />
+            </LinearLayout>
+
+            <!-- 地址胶囊：点右边图标复制。原来只能看不能复制，想手输得自己抄 -->
+            <LinearLayout
+                android:id="@+id/addr_pill"
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:background="@drawable/addr_pill_bg"
+                android:gravity="center_vertical"
+                android:paddingStart="12dp"
+                android:paddingEnd="8dp"
+                android:paddingTop="9dp"
+                android:paddingBottom="9dp">
+
+                <TextView
+                    android:id="@+id/server_url"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:textColor="@color/jc_brand"
+                    android:textSize="12.5sp"
+                    android:textStyle="bold" />
+
+                <ImageButton
+                    android:id="@+id/copy_ip_btn"
+                    android:layout_width="26dp"
+                    android:layout_height="26dp"
+                    android:background="@null"
+                    android:contentDescription="复制地址"
+                    android:padding="5dp"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/ic_copy" />
+            </LinearLayout>
+
+            <!-- 多网卡候选地址：只有真的有两个以上地址时才出现，平时不占地方 -->
+            <LinearLayout
+                android:id="@+id/ip_list"
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp" />
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:id="@+id/refresh_ip_btn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/btn_ghost"
+                    android:paddingStart="14dp"
+                    android:paddingEnd="14dp"
+                    android:paddingTop="7dp"
+                    android:paddingBottom="7dp"
+                    android:text="刷新地址"
+                    android:textColor="@color/jc_text2"
+                    android:textSize="11.5sp" />
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="1dp"
+                    android:layout_weight="1" />
+
+                <TextView
+                    android:id="@+id/diag_btn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingStart="8dp"
+                    android:paddingEnd="4dp"
+                    android:paddingTop="7dp"
+                    android:paddingBottom="7dp"
+                    android:text="连不上？自检"
+                    android:textColor="@color/jc_text3"
+                    android:textSize="11sp" />
+            </LinearLayout>
+
+            <!-- 访问状态：没人来 / 谁在下载，都在这条线上 -->
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:id="@+id/peer_text"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="还没人访问过"
+                    android:textColor="@color/jc_text3"
+                    android:textSize="11sp" />
+            </LinearLayout>
+
+            <!-- 接收到的文件：一张卡，数字会随接收数量滚动增长 -->
+            <LinearLayout
+                android:id="@+id/recv_card"
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/recv_card_bg"
+                android:gravity="center_vertical"
+                android:padding="11dp">
+
+                <ImageView
+                    android:id="@+id/recv_icon"
+                    android:layout_width="15dp"
+                    android:layout_height="15dp"
+                    android:layout_marginStart="2dp"
+                    android:layout_marginEnd="10dp"
+                    android:src="@drawable/ic_folder"
+                    android:contentDescription="接收文件夹" />
+
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1">
+
+                    <TextView
+                        android:id="@+id/server_stats"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:maxLines="1"
+                        android:ellipsize="end"
+                        android:text="已接收 0 个文件"
+                        android:textColor="@color/jc_text"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/recv_sub"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:ellipsize="end"
+                        android:maxLines="1"
+                        android:text="手机共 0 个文件可分享"
+                        android:textColor="@color/jc_text3"
+                        android:textSize="11sp" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/open_dl_btn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingStart="10dp"
+                    android:paddingEnd="4dp"
+                    android:paddingTop="6dp"
+                    android:paddingBottom="6dp"
+                    android:text="打开"
+                    android:textColor="@color/jc_brand"
+                    android:textSize="11.5sp" />
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:gravity="center"
+                android:text="保持本页在前台，传输不会中断"
+                android:textColor="@color/jc_text3"
+                android:textSize="11sp" />
+        </LinearLayout>
+    </ScrollView>
+
+</LinearLayout>
+
+    <!-- 连接抽屉的遮罩：点空白处收起。
+         放在 FrameLayout 里而不是布局流里，是为了不挤压 WebView —— 原来那块常驻面板
+         会把输入框顶出屏幕。 -->
+    <View
+        android:id="@+id/conn_scrim"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#40000000"
+        android:clickable="true"
+        android:focusable="false"
+        android:visibility="gone" />
+
+    <!-- 连接抽屉：从底部滑入，带上圆角、拖动条、右上 ✕。
+         三种收起方式：✕ / 点遮罩 / 系统返回键。 -->
+    <LinearLayout
+        android:id="@+id/conn_drawer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:orientation="vertical"
+        android:background="@drawable/drawer_bg"
+        android:elevation="14dp"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="16dp"
+        android:visibility="gone">
+
+        <View
+            android:id="@+id/drawer_handle"
+            android:layout_width="34dp"
+            android:layout_height="4dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="2dp"
+            android:background="@drawable/dot" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/drawer_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="连接电脑"
+                android:textColor="@color/jc_text"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_weight="1" />
+
+            <ImageButton
+                android:id="@+id/drawer_close"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:background="@drawable/round_btn"
+                android:padding="7dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/ic_close"
+                android:contentDescription="收起" />
+        </LinearLayout>
+
+        <EditText
+            android:id="@+id/addr_input"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:hint="192.168.1.5:8787 或 trycloudflare 网址"
+            android:textColor="@color/jc_text"
+            android:textColorHint="@color/jc_text3"
+            android:inputType="textUri"
+            android:textSize="13sp"
+            android:background="@drawable/input_bg"
+            android:padding="12dp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/go_btn"
+                android:layout_width="0dp"
+                android:layout_height="38dp"
+                android:layout_weight="1"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:text="连接"
+                android:textColor="#ffffff" />
+
+            <Button
+                android:id="@+id/scan_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="38dp"
+                android:layout_marginStart="10dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:text="扫码"
+                android:textColor="#ffffff" />
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="同 WiFi 填局域网 IP；在外网传文件，填电脑开公网后给的网址（需输密码）"
+            android:textColor="@color/jc_text3"
+            android:textSize="11sp" />
+    </LinearLayout>
+
+    <!-- 下载进度浮层：贴底堆叠，几条任务就几块卡片。
+         平时 visibility=gone，一旦开始下载才出现，传完自动淡出移除。 -->
+    <LinearLayout
+        android:id="@+id/dl_panel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:orientation="vertical"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
+        android:paddingBottom="12dp"
+        android:visibility="gone" />
+
+</FrameLayout>

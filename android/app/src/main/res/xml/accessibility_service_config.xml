@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  跳广告的无障碍配置。三个参数缺一不可，都踩过坑：
+
+  1. accessibilityEventTypes 必须同时含 typeWindowContentChanged。
+     开屏广告的「跳过」按钮是广告 SDK 异步渲染的：窗口切换事件到达时树里还没有按钮，
+     等按钮出现只会再发一条 content changed。只听 windowStateChanged = 永远跳不掉。
+  2. flagIncludeNotImportantViews 必须开。
+     广告按钮常被标成 importantForAccessibility=no，不开这个 flag 在节点树里根本看不到。
+  3. flagRetrieveInteractiveWindows 用于遍历多窗口。
+     广告有时在独立 window 里，rootInActiveWindow 拿到的是 App 主窗口，扫不到。
+-->
+<accessibility-service xmlns:android="http://schemas.android.com/apk/res/android"
+    android:description="@string/accessibility_desc"
+    android:accessibilityEventTypes="typeWindowStateChanged|typeWindowContentChanged"
+    android:accessibilityFeedbackType="feedbackGeneric"
+    android:accessibilityFlags="flagIncludeNotImportantViews|flagReportViewIds|flagRetrieveInteractiveWindows"
+    android:notificationTimeout="100"
+    android:canRetrieveWindowContent="true"
+    android:canPerformGestures="true" />

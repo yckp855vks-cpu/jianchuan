@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 底部主按钮未满足条件时的灰态（可点跳过直接进主界面） -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="#B7CFE0" />
+    <corners android:radius="14dp" />
+</shape>

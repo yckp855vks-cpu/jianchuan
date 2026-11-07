@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 单条下载任务：图标 + 文件名 + 百分比 / 进度条 / 已传大小 + 速度 -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/dl_card_bg"
+    android:paddingStart="14dp"
+    android:paddingEnd="14dp"
+    android:paddingTop="13dp"
+    android:paddingBottom="13dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <FrameLayout
+            android:layout_width="34dp"
+            android:layout_height="34dp"
+            android:background="@drawable/dl_icon_bg">
+
+            <ImageView
+                android:id="@+id/dl_icon"
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_dl_arrow"
+                android:contentDescription="下载" />
+        </FrameLayout>
+
+        <TextView
+            android:id="@+id/dl_name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="11dp"
+            android:maxLines="1"
+            android:ellipsize="middle"
+            android:textColor="#E8F1FA"
+            android:textSize="13.5sp"
+            android:fontFamily="sans-serif-medium"
+            android:text="文件" />
+
+        <TextView
+            android:id="@+id/dl_state"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:textColor="#A5B9C8"
+            android:textSize="12.5sp"
+            android:fontFamily="sans-serif-medium"
+            android:text="0%" />
+    </LinearLayout>
+
+    <ProgressBar
+        android:id="@+id/dl_bar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="6dp"
+        android:layout_marginTop="12dp"
+        android:max="1000"
+        android:progress="0"
+        android:indeterminate="false"
+        android:progressDrawable="@drawable/dl_progress" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="8dp">
+
+        <TextView
+            android:id="@+id/dl_size"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textColor="#7F95A8"
+            android:textSize="11sp"
+            android:text="0 B" />
+
+        <TextView
+            android:id="@+id/dl_speed"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#52A8C6"
+            android:textSize="11sp"
+            android:text="" />
+    </LinearLayout>
+</LinearLayout>

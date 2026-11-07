@@ -1,0 +1,20 @@
+{
+  "roots": [
+    {
+      "name": "电影",
+      "path": "D://Movies"
+    },
+    {
+      "name": "剧集",
+      "path": "D://TV Shows"
+    },
+    {
+      "name": "手机传过来",
+      "path": "C://Users//Public//Videos"
+    }
+  ],
+  "port": 8848,
+  "host": "0.0.0.0",
+  "title": "MediaShare",
+  "quiet": false
+}

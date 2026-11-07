@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 图标胶囊未激活态：透明底 + 一像素描边。激活态由代码生成填充色，便于跟主题走。 -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="#00000000" />
+    <corners android:radius="13dp" />
+    <stroke android:width="1dp" android:color="#D5E2ED" />
+</shape>

@@ -1,0 +1,1166 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0a0d13">
+<title>MediaShare</title>
+<style>
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  :root{
+    --bg:#0a0d13; --bg2:#0d1219; --panel:#111823; --card:#161e2b; --card2:#1b2635;
+    --line:#1f2b3d; --text:#e8eef7; --dim:#8497ad; --dim2:#5a6b80;
+    --accent:#22d3ee; --warn:#f59e0b;
+    --c-folder:#f59e0b; --c-video:#22d3ee; --c-audio:#a78bfa; --c-image:#34d399; --c-doc:#94a3b8; --c-other:#64748b;
+  }
+  html,body{margin:0;padding:0;height:100%}
+  body{
+    background:
+      radial-gradient(1100px 600px at 12% -10%, #16283a 0%, transparent 60%),
+      radial-gradient(900px 500px at 92% 0%, #1b1c3a 0%, transparent 55%),
+      var(--bg);
+    color:var(--text);
+    font-family:system-ui,-apple-system,"Segoe UI","Microsoft YaHei",sans-serif;
+    font-size:16px;line-height:1.4;
+    overflow:hidden;
+  }
+
+  /* ---------- 顶栏 ---------- */
+  header{
+    position:fixed;top:0;left:0;right:0;height:76px;z-index:20;
+    display:flex;align-items:center;padding:0 28px;
+    background:linear-gradient(180deg,rgba(10,13,19,.96) 40%,rgba(10,13,19,0));
+  }
+  .brand{display:flex;align-items:center;flex:none;margin-right:26px}
+  .upbtn{
+    flex:none;display:flex;align-items:center;justify-content:center;
+    width:44px;height:44px;margin-right:14px;border-radius:12px;
+    border:1px solid var(--line);background:#ffffff0d;color:var(--text);
+    font-size:26px;line-height:1;padding:0 0 4px;cursor:pointer;font-family:inherit;
+    transition:.16s
+  }
+  .upbtn:hover{color:var(--accent);border-color:#22d3ee55;background:#22d3ee14}
+  .upbtn:focus{outline:none;box-shadow:0 0 0 3px var(--accent);color:var(--accent)}
+  .upbtn[hidden]{display:none}
+  .dot{width:11px;height:11px;border-radius:50%;background:var(--accent);
+    box-shadow:0 0 14px var(--accent);margin-right:11px;flex:none}
+  .brand b{font-size:19px;letter-spacing:.4px;font-weight:700}
+  .brand span{font-size:12px;color:var(--dim2);margin-left:9px;letter-spacing:2px}
+
+  .crumbs{flex:1;display:flex;align-items:center;overflow:hidden;white-space:nowrap;
+    mask-image:linear-gradient(90deg,#000 88%,transparent)}
+  .crumb{color:var(--dim);font-size:15px;padding:7px 11px;border-radius:8px;
+    cursor:pointer;border:0;background:none;font-family:inherit;flex:none}
+  .crumb:hover{color:var(--text);background:#ffffff10}
+  .crumb:focus{outline:none;color:#06121a;background:var(--accent);
+    box-shadow:0 0 0 3px rgba(34,211,238,.35)}
+  .crumb.here{color:var(--text);font-weight:600}
+  .crumb.here:focus{color:#06121a}
+  .sep{color:#2c3a4d;font-size:13px;flex:none}
+
+  .search{flex:none;position:relative;margin-left:16px}
+  .search input{
+    width:210px;height:42px;padding:0 16px 0 40px;border-radius:12px;
+    background:#ffffff0d;border:1px solid var(--line);color:var(--text);
+    font-size:14px;font-family:inherit;outline:none;transition:.18s;
+  }
+  .search input::placeholder{color:var(--dim2)}
+  .search input:focus{width:270px;border-color:var(--accent);background:#22d3ee14;
+    box-shadow:0 0 0 3px #22d3ee26}
+  .search .ico{position:absolute;left:14px;top:12px;width:17px;height:17px;stroke:var(--dim2);fill:none;stroke-width:2}
+
+  .fsbtn{flex:none;width:42px;height:42px;margin-left:12px;border-radius:12px;
+    border:1px solid var(--line);background:#ffffff0d;color:var(--dim);
+    cursor:pointer;font-family:inherit;line-height:1;padding:0}
+  .fsbtn svg{width:19px;height:19px;stroke:currentColor;fill:none;stroke-width:2;
+    vertical-align:middle;margin-top:-2px}
+  .fsbtn:hover{color:var(--accent);border-color:#22d3ee55;background:#22d3ee14}
+  .fsbtn:focus{outline:none;box-shadow:0 0 0 3px var(--accent);color:var(--accent)}
+
+  /* ---------- 布局 ---------- */
+  .shell{display:flex;height:100%;padding-top:76px}
+  aside{
+    flex:none;width:186px;padding:12px 16px 90px 22px;overflow:hidden;
+  }
+  .filters{display:flex;flex-direction:column}
+  .filter{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:12px 14px;margin-bottom:6px;border-radius:11px;cursor:pointer;
+    border:0;background:none;color:var(--dim);font-size:15px;font-family:inherit;
+    text-align:left;transition:.16s;border:1px solid transparent;
+  }
+  .filter:hover{background:#ffffff0a;color:var(--text)}
+  .filter:focus{background:#ffffff10;color:var(--text);outline:none;
+    box-shadow:0 0 0 2px var(--accent)}
+  .filter.on{background:#22d3ee1a;color:var(--accent);border-color:#22d3ee33;font-weight:600}
+  .filter .n{font-size:12px;color:var(--dim2);background:#ffffff0d;
+    padding:2px 8px;border-radius:99px;min-width:26px;text-align:center}
+  .filter.on .n{color:var(--accent);background:#22d3ee22}
+
+  main{flex:1;overflow-y:auto;overflow-x:hidden;padding:14px 30px 120px 8px;scroll-behavior:smooth}
+  main::-webkit-scrollbar{width:9px}
+  main::-webkit-scrollbar-thumb{background:#243044;border-radius:9px}
+  main::-webkit-scrollbar-thumb:hover{background:#2f3f57}
+
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(208px,1fr));
+    grid-gap:18px;align-content:start}
+
+  /* ---------- 卡片 ---------- */
+  .card{
+    position:relative;background:var(--card);border-radius:15px;overflow:hidden;
+    cursor:pointer;border:1px solid #ffffff08;
+    transition:transform .16s ease,box-shadow .16s ease,background .16s;
+    outline:none;
+  }
+  .card:hover{background:var(--card2);transform:translateY(-3px)}
+  .card:focus{
+    background:var(--card2);transform:scale(1.055);
+    box-shadow:0 0 0 3px var(--accent),0 16px 44px -10px rgba(34,211,238,.55);
+    z-index:3;
+  }
+  .thumb{
+    position:relative;height:120px;display:flex;align-items:center;justify-content:center;
+    background:linear-gradient(145deg,#1a2534,#131a26);overflow:hidden;
+  }
+  .thumb img{width:100%;height:100%;object-fit:cover;display:block}
+  .thumb .glow{position:absolute;width:120px;height:120px;border-radius:50%;
+    filter:blur(26px);opacity:.42}
+  .thumb svg{position:relative;width:46px;height:46px;stroke-width:1.6;fill:none}
+  /* 视频海报：图铺满，兜底图标盖在最上层，海报加载成功后藏起来 */
+  .thumb .poster{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+  .thumb .pic-ico{position:absolute;z-index:1;width:46px;height:46px}
+  .thumb.has-poster .pic-ico,.thumb.has-poster .glow{display:none}
+  .thumb.has-poster::after{content:'';position:absolute;inset:0;
+    background:linear-gradient(180deg,transparent 55%,rgba(5,7,11,.55))}
+  .kindline{position:absolute;left:0;top:0;bottom:0;width:3px}
+  .badge{
+    position:absolute;right:9px;top:9px;font-size:11px;letter-spacing:.6px;
+    padding:3px 8px;border-radius:6px;background:#000a;color:#c6d4e4;font-weight:600;
+    text-transform:uppercase;backdrop-filter:blur(4px)
+  }
+  /* 看到哪儿了：缩略图底部一条细进度 + 右上角百分比 */
+  .watchbar{position:absolute;left:0;right:0;bottom:0;height:4px;background:#000000a6}
+  .watchbar i{display:block;height:100%;background:var(--accent);
+    box-shadow:0 0 8px rgba(34,211,238,.7)}
+  .watched{
+    position:absolute;left:9px;bottom:9px;font-size:10.5px;font-weight:700;
+    padding:2px 7px;border-radius:6px;background:#000000b8;color:#7ee7f7;
+    letter-spacing:.3px;font-variant-numeric:tabular-nums
+  }
+  .meta{padding:13px 14px 15px}
+  .name{font-size:15px;font-weight:600;color:var(--text);
+    display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;
+    overflow:hidden;overflow-wrap:break-word;word-break:normal;line-height:1.38}
+  .sub{font-size:12px;color:var(--dim2);margin-top:6px;display:flex;align-items:center}
+  .sub i{font-style:normal;color:#33445c;margin:0 6px}
+
+  .card.k-folder .glow{background:var(--c-folder)}
+  .card.k-folder svg{stroke:var(--c-folder)}
+  .card.k-video .glow{background:var(--c-video)}
+  .card.k-video svg{stroke:var(--c-video)}
+  .card.k-audio .glow{background:var(--c-audio)}
+  .card.k-audio svg{stroke:var(--c-audio)}
+  .card.k-image .glow{background:var(--c-image)}
+  .card.k-image svg{stroke:var(--c-image)}
+  .card.k-doc .glow{background:var(--c-doc)}
+  .card.k-doc svg{stroke:var(--c-doc)}
+  .card.k-other .glow{background:var(--c-other)}
+  .card.k-other svg{stroke:var(--c-other)}
+
+  /* ---------- 状态栏 ---------- */
+  footer{
+    position:fixed;left:0;right:0;bottom:0;height:54px;z-index:20;
+    display:flex;align-items:center;padding:0 30px;font-size:12.5px;color:var(--dim2);
+    background:linear-gradient(0deg,rgba(10,13,19,.97) 45%,rgba(10,13,19,0));
+  }
+  footer b{color:var(--dim);font-weight:600}
+  .keys{margin-left:auto;display:flex;align-items:center}
+  .key{display:inline-flex;align-items:center;margin-left:16px}
+  .kbd{font-family:inherit;font-size:11px;color:#b9c7d8;background:#ffffff0f;
+    border:1px solid #ffffff17;border-bottom-width:2px;border-radius:6px;
+    padding:3px 7px;margin-right:7px}
+
+  /* ---------- 空态 / 加载 ---------- */
+  .empty{padding:90px 20px;text-align:center;color:var(--dim2)}
+  .empty svg{width:58px;height:58px;stroke:#2d3a4d;fill:none;stroke-width:1.4;margin-bottom:16px}
+  .empty p{margin:6px 0;font-size:15px}
+  .empty small{font-size:13px;color:#46566b}
+  .skel{height:196px;border-radius:15px;background:linear-gradient(100deg,#141b26 20%,#1c2636 40%,#141b26 60%);
+    background-size:220% 100%;animation:sk 1.15s linear infinite}
+  @keyframes sk{to{background-position:-120% 0}}
+
+  /* ---------- 图片灯箱 ---------- */
+  .lightbox{position:fixed;inset:0;z-index:60;background:#000e;display:none;
+    align-items:center;justify-content:center;padding:40px}
+  .lightbox.on{display:flex}
+  .lightbox img{max-width:100%;max-height:100%;object-fit:contain;border-radius:8px}
+  .lightbox .close{position:absolute;top:22px;right:26px;width:44px;height:44px;border-radius:50%;
+    background:#ffffff14;border:0;color:#fff;font-size:20px;cursor:pointer}
+  .lightbox .nav{position:absolute;top:50%;transform:translateY(-50%);width:52px;height:52px;
+    border-radius:50%;background:#ffffff12;border:0;color:#fff;font-size:22px;cursor:pointer}
+  .lightbox .prev{left:24px}.lightbox .next{right:24px}
+
+  /* ---------- 电视/投影仪：3 米外观看，整体放大到约 1.5 倍 ---------- */
+  body.tv{font-size:20px}
+  body.tv header{height:82px;padding:0 24px}
+  body.tv .brand b{font-size:29px}
+  body.tv .upbtn{width:58px;height:58px;font-size:34px;margin-right:18px;border-radius:14px;padding-bottom:6px}
+  body.tv .brand span{font-size:15px;letter-spacing:2px}
+  body.tv .dot{width:13px;height:13px}
+  body.tv .shell{padding-top:82px}
+  body.tv aside{width:210px;padding:12px 14px 120px 18px}
+  body.tv .filter{font-size:22px;padding:16px 16px;border-radius:12px}
+  body.tv .filter .n{font-size:15px;padding:2px 8px}
+  body.tv .crumb{font-size:22px;padding:9px 13px}
+  body.tv .sep{font-size:19px}
+  body.tv main{padding:12px 24px 132px 8px}
+  body.tv .grid{grid-template-columns:repeat(auto-fill,minmax(208px,1fr));grid-gap:18px}
+  body.tv .card{border-radius:15px}
+  body.tv .thumb{height:104px;border-radius:15px}
+  body.tv .thumb svg{width:44px;height:44px}
+  body.tv .meta{padding:9px 12px 11px}
+  body.tv .name{font-size:20px;line-height:1.3}
+  body.tv .sub{font-size:14px;margin-top:4px}
+  body.tv .badge{font-size:15px;padding:6px 12px}
+  body.tv footer{font-size:17px;height:52px;padding:0 26px}
+  body.tv .kbd{font-size:15px}
+  body.tv .search input{width:252px;height:54px;font-size:19px;padding-left:44px}
+  body.tv .search .ico{width:23px;height:23px;left:16px;top:17px}
+  /* 投影仪上没有文件选择器和浏览器全屏，这两个按钮在电视模式里是死胡同，直接收起来 */
+  body.tv #uploadBtn, body.tv #fsbtn{display:none}
+  body.tv .empty p{font-size:24px}
+  body.tv .empty small{font-size:18px}
+
+  /* ---------- 手机触屏适配（CSS 媒体查询，不依赖 JS 检测） ---------- */
+  @media (max-width: 600px) {
+    body{font-size:15px}
+    header{height:56px;padding:0 10px}
+    .brand b{font-size:16px}
+    .brand span{display:none}
+    .brand{margin-right:6px}
+    .upbtn{width:36px;height:36px;margin-right:6px;font-size:22px;padding-bottom:3px;border-radius:10px;flex:none}
+    .dot{width:9px;height:9px;margin-right:6px}
+    .crumbs{font-size:13px;mask-image:linear-gradient(90deg,#000 80%,transparent);flex:1}
+    .crumb{padding:5px 6px;font-size:13px}
+    .sep{font-size:11px}
+    .search{margin-left:6px;display:none}
+    .fsbtn{display:none}
+    .uploadbtn{width:36px;height:36px;padding:0;margin-left:6px;border-radius:10px;justify-content:center;flex:none}
+    .uploadbtn b{display:none}
+    .uploadbtn svg{width:17px;height:17px}
+    .shell{padding-top:56px;flex-direction:column}
+    aside{width:100%;padding:0;border-bottom:1px solid var(--line);
+      overflow-x:auto;overflow-y:hidden;flex:none}
+    .filters{flex-direction:row;gap:6px;padding:8px 12px}
+    .filter{padding:8px 14px;margin:0;font-size:13px;flex:none;
+      border-radius:20px;background:#ffffff08}
+    .filter .n{font-size:11px;padding:1px 6px}
+    main{padding:10px 12px 110px}
+    .grid{grid-template-columns:repeat(2,1fr);grid-gap:10px}
+    .thumb{height:80px}
+    .thumb svg{width:32px;height:32px}
+    .name{font-size:13px;line-height:1.3;display:-webkit-box;
+      -webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+    .sub{font-size:11px}
+    .badge{font-size:11px;padding:3px 8px}
+    footer{height:40px;font-size:12px;padding:0 14px}
+    .keys{display:none}
+    .uploadbtn{height:40px;font-size:14px;padding:0 14px}
+    .uploadbtn svg{width:17px;height:17px}
+    .upload-card h3{font-size:18px}
+    .upload-row .fname{font-size:13px}
+    .upload-actions button{font-size:14px;padding:10px 24px}
+    .empty p{font-size:18px}
+    .empty small{font-size:14px}
+    .card{transition:none}
+    .card:hover{transform:none;box-shadow:none;background:var(--card)}
+    .card:active{transform:scale(.97);background:var(--card2)}
+  }
+
+  /* ---------- 上传按钮 / 进度条 ---------- */
+  .uploadbtn{
+    flex:none;display:flex;align-items:center;gap:7px;height:42px;padding:0 18px;
+    margin-left:12px;border-radius:12px;border:1px solid #22d3ee55;
+    background:#22d3ee14;color:var(--accent);cursor:pointer;font-family:inherit;
+    font-size:14px;font-weight:600;transition:.18s;
+  }
+  .uploadbtn:hover{color:#67e8f9;border-color:#22d3ee99;background:#22d3ee22}
+  .uploadbtn:focus{outline:none;box-shadow:0 0 0 3px #22d3ee55;color:var(--accent)}
+  .uploadbtn svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2}
+  body.tv .uploadbtn{height:54px;font-size:19px;padding:0 22px}
+  body.tv .uploadbtn svg{width:23px;height:23px}
+
+  .upload-panel{
+    position:fixed;inset:0;z-index:80;background:#000c;display:none;
+    align-items:center;justify-content:center;
+  }
+  .upload-panel.on{display:flex}
+  .upload-card{
+    background:var(--panel);border:1px solid var(--line);border-radius:18px;
+    padding:32px 36px;width:min(520px,90vw);max-height:80vh;overflow-y:auto;
+  }
+  .upload-card h3{margin:0 0 18px;font-size:19px}
+  .upload-row{
+    display:flex;align-items:center;gap:12px;padding:12px 0;
+    border-bottom:1px solid var(--line);
+  }
+  .upload-row .fname{flex:1;font-size:14px;color:var(--text);overflow:hidden;
+    text-overflow:ellipsis;white-space:nowrap}
+  .upload-row .fsize{font-size:12px;color:var(--dim2);flex:none}
+  .upload-row .pbar{
+    flex:none;width:110px;height:8px;border-radius:99px;background:#ffffff12;overflow:hidden;
+  }
+  .upload-row .pfill{height:100%;border-radius:99px;background:var(--accent);
+    transition:width .25s;width:0}
+  .upload-row .pstatus{flex:none;font-size:12px;width:64px;text-align:right}
+  .upload-row .pstatus.done{color:#34d399}
+  .upload-row .pstatus.err{color:#f87171}
+  .upload-row .pstatus.up{color:var(--accent)}
+  .upload-actions{display:flex;gap:12px;margin-top:22px;justify-content:flex-end}
+  .upload-actions button{
+    padding:11px 26px;border-radius:11px;font-size:15px;font-weight:600;
+    cursor:pointer;font-family:inherit;border:0;
+  }
+  .upload-actions .ok{background:var(--accent);color:#0a0d13}
+  .upload-actions .cancel{background:#ffffff14;color:var(--text)}
+  body.tv .upload-card h3{font-size:24px}
+  body.tv .upload-row .fname{font-size:19px}
+  body.tv .upload-row .pbar{width:150px;height:11px}
+  body.tv .upload-actions button{font-size:19px;padding:14px 32px}
+
+  /* 隐藏文件选择框 */
+  #fileInput{display:none}
+</style>
+</head>
+<body>
+
+<header>
+  <button class="upbtn" id="upBtn" hidden aria-label="返回上级">‹</button>
+  <div class="brand"><span class="dot"></span><b>MediaShare</b><span>LAN</span></div>
+  <div class="crumbs" id="crumbs"></div>
+  <div class="search">
+    <svg class="ico" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+    <input id="q" type="search" placeholder="搜索当前目录…" autocomplete="off">
+  </div>
+  <button class="uploadbtn" id="uploadBtn" title="上传视频">
+    <svg viewBox="0 0 24 24"><path d="M12 16V4m0 0l-4 4m4-4l4 4"/><path d="M4 17v2a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-2"/></svg>
+    <b>上传</b>
+  </button>
+  <button class="fsbtn" id="fsbtn" title="全屏">
+    <svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>
+  </button>
+</header>
+
+<div class="shell">
+  <aside>
+    <div class="filters" id="filters"></div>
+  </aside>
+  <main id="main">
+    <div class="grid" id="grid"></div>
+  </main>
+</div>
+
+<footer>
+  <span id="stat">正在读取…</span>
+  <div class="keys">
+    <span class="key"><span class="kbd">◀ ▶ ▲ ▼</span>选择</span>
+    <span class="key"><span class="kbd">OK</span>打开</span>
+    <span class="key"><span class="kbd">▲</span>顶栏</span>
+    <span class="key"><span class="kbd">返回</span>上一级</span>
+  </div>
+</footer>
+
+<input type="file" id="fileInput" multiple accept="video/*,audio/*,.mkv,.avi,.mov,.wmv,.flv,.ts,.rmvb">
+
+<div class="upload-panel" id="uploadPanel">
+  <div class="upload-card">
+    <h3>📤 上传到「手机上传」</h3>
+    <div id="uploadList"></div>
+    <div class="upload-actions">
+      <button class="cancel" onclick="closeUploadPanel()">关闭</button>
+    </div>
+  </div>
+</div>
+
+<div class="lightbox" id="lightbox">
+  <button class="close" onclick="closeBox()">✕</button>
+  <button class="nav prev" onclick="stepBox(-1)">‹</button>
+  <img id="boximg" alt="">
+  <button class="nav next" onclick="stepBox(1)">›</button>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  // 电视 / 投影仪 / 机顶盒：视口小、观看距离远，整体放一档字号
+  var ua = navigator.userAgent;
+  // 投影仪/盒子：只认 TV 类设备，不认普通 Android 手机
+  if (/TV|BRAVIA|MiBOX|NVIDIA SHIELD|Xming|Formovie|AFT|SmartTV|Web0S|NetCast/i.test(ua)) {
+    document.body.classList.add('tv');
+  }
+  // 手机/平板触屏
+  var isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+  var isSmallScreen = Math.min(screen.width, screen.height) < 768;
+  if (isTouch && isSmallScreen) {
+    document.body.classList.add('mobile');
+  }
+
+  var ICONS = {
+    folder:'<path d="M3 7.5A2.5 2.5 0 0 1 5.5 5h4l2 2.5h7A2.5 2.5 0 0 1 21 10v7.5A2.5 2.5 0 0 1 18.5 20h-13A2.5 2.5 0 0 1 3 17.5z"/>',
+    video:'<rect x="2.5" y="5" width="19" height="14" rx="2.5"/><path d="M10 9.4l5 2.6-5 2.6z"/>',
+    audio:'<path d="M9 18V6l10-2v12"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="16.5" cy="16" r="2.5"/>',
+    image:'<rect x="3" y="4.5" width="18" height="15" rx="2.5"/><circle cx="8.5" cy="10" r="1.6"/><path d="M4 17l4.5-4.5L13 17l3-3 4 4"/>',
+    doc:'<path d="M6 3.5h7l5 5V20a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4.5a1 1 0 0 1 1-1z"/><path d="M13 3.5v5h5"/>',
+    other:'<circle cx="12" cy="12" r="8.5"/><path d="M12 8v4.5l3 2"/>'
+  };
+
+  var FILTERS = [
+    {id:'all',  label:'全部',  icon:null},
+    {id:'folder', label:'文件夹'},
+    {id:'video', label:'视频'},
+    {id:'audio', label:'音乐'},
+    {id:'image', label:'图片'},
+    {id:'doc',   label:'文档'}
+  ];
+
+  var state = {path:'', kind:'all', q:'', entries:[], filtered:[], loading:false};
+  var grid = document.getElementById('grid');
+  var main = document.getElementById('main');
+  var crumbBox = document.getElementById('crumbs');
+  var statBox = document.getElementById('stat');
+  var qBox = document.getElementById('q');
+  var lightbox = document.getElementById('lightbox');
+  var boximg = document.getElementById('boximg');
+  var boxList = [], boxIdx = 0;
+
+  function fmtTime(ts){
+    var d = new Date(ts * 1000), now = new Date();
+    var sameDay = d.toDateString() === now.toDateString();
+    function p(n){ return n < 10 ? '0' + n : '' + n; }
+    if (sameDay) return '今天 ' + p(d.getHours()) + ':' + p(d.getMinutes());
+    return (d.getMonth() + 1) + '月' + d.getDate() + '日';
+  }
+
+  function el(tag, cls, html){
+    var n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (html != null) n.innerHTML = html;
+    return n;
+  }
+
+  function encPath(p){ return encodeURIComponent(p); }
+
+  // ---------- 数据 ----------
+  function load(path, push){
+    state.loading = true;
+    renderSkeleton();
+    var url = '/api/list?path=' + encPath(path || '');
+    fetch(url).then(function(r){ return r.json(); }).then(function(data){
+      if (data.error) {
+        showEmpty('打不开这个目录', data.error + '，按返回键回上一级');
+        renderCrumbs([{name:'主页', path:''}]);
+        renderFilters();
+        return;
+      }
+      state.path = data.path || '';
+      state.entries = data.entries || [];
+      state.q = '';
+      qBox.value = '';
+      state.loading = false;
+      if (push !== false) {
+        var qs = state.path ? '?p=' + encPath(state.path) : location.pathname;
+        history.pushState({p: state.path}, '', qs);
+      }
+      paintUp();
+      renderCrumbs(data.crumbs || []);
+      renderFilters();
+      applyFilter(true);
+    }).catch(function(err){
+      state.loading = false;
+      showEmpty('连接不上服务', String(err));
+    });
+  }
+
+  function search(q){
+    if (!q) { applyFilter(true); return; }
+    state.q = q;
+    state.loading = true;
+    renderSkeleton();
+    fetch('/api/search?path=' + encPath(state.path) + '&q=' + encPath(q))
+      .then(function(r){ return r.json(); })
+      .then(function(data){
+        state.entries = data.entries || [];
+        state.loading = false;
+        renderFilters();
+        applyFilter(false);
+        statBox.innerHTML = '搜索「' + escapeHtml(q) + '」找到 <b>' + state.entries.length + '</b> 项' +
+          (data.truncated ? ' <span style="color:#f59e0b">（结果过多，已截断）</span>' : '');
+      });
+  }
+
+  function escapeHtml(s){
+    return String(s).replace(/[&<>"']/g, function(c){
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+    });
+  }
+
+  // ---------- 播放历史 ----------
+  function loadHistory(){
+    state.loading = true;
+    renderSkeleton();
+    fetch('/api/history').then(function(r){ return r.json(); }).then(function(data){
+      state.loading = false;
+      grid.innerHTML = '';
+      var items = data.items || [];
+      if (!items.length) {
+        showEmpty('还没有观看记录', '看过的影片会自动出现在这里，方便接着看');
+        statBox.innerHTML = '历史';
+        return;
+      }
+      items.forEach(function(h, i){
+        grid.appendChild(makeHistoryCard(h, i));
+      });
+      statBox.innerHTML = '最近看过 <b>' + items.length + '</b> 部';
+      focusFirst();
+    }).catch(function(err){
+      state.loading = false;
+      showEmpty('加载历史失败', String(err));
+    });
+  }
+
+  function fmtPct(p){
+    return Math.max(1, Math.round(p * 100)) + '%';
+  }
+
+  function makeHistoryCard(h, idx){
+    var c = el('div', 'card k-video');
+    c.tabIndex = 0;
+    c.dataset.idx = idx;
+    c.dataset.path = h.path;
+
+    var thumb = el('div', 'thumb');
+    if (h.poster) {
+      var img = new Image();
+      img.loading = 'lazy';
+      img.alt = '';
+      img.className = 'poster';
+      img.onload = function(){ thumb.classList.add('has-poster'); };
+      img.src = h.poster;
+      thumb.appendChild(img);
+      thumb.appendChild(el('span', 'glow'));
+      var ico = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      ico.setAttribute('viewBox', '0 0 24 24');
+      ico.setAttribute('class', 'pic-ico');
+      ico.innerHTML = ICONS.video;
+      thumb.appendChild(ico);
+    } else {
+      thumb.innerHTML = '<span class="glow"></span><svg viewBox="0 0 24 24">' + ICONS.video + '</svg>';
+    }
+    // 看到哪儿了
+    if (h.pct > 0.01 && h.pct < 0.99) {
+      var pct = Math.max(1, Math.round(h.pct * 100));
+      thumb.appendChild(el('span', 'watchbar', '<i style="width:' + pct + '%"></i>'));
+      thumb.appendChild(el('span', 'watched', '看到 ' + pct + '%'));
+    }
+    c.appendChild(thumb);
+
+    var meta = el('div', 'meta');
+    var nameEl = el('div', 'name', escapeHtml(h.title || h.name));
+    nameEl.title = h.name;
+    meta.appendChild(nameEl);
+    var sub = el('div', 'sub');
+    sub.innerHTML = '看到 ' + fmtTimeOf(h.pos) + '<i>·</i>' + fmtTime(h.ts);
+    meta.appendChild(sub);
+    c.appendChild(meta);
+
+    c.addEventListener('click', function(){
+      location.href = '/play?path=' + encPath(h.path) + '&title=' + encodeURIComponent(h.title || h.name);
+    });
+    c.addEventListener('keydown', function(ev){
+      if (ev.keyCode === 13) { ev.preventDefault(); c.click(); }
+    });
+    c.addEventListener('focus', function(){
+      var r = c.getBoundingClientRect();
+      var mr = main.getBoundingClientRect();
+      if (r.top < mr.top + 8) main.scrollTop += r.top - mr.top - 18;
+      else if (r.bottom > mr.bottom - 8) main.scrollTop += r.bottom - mr.bottom + 18;
+    });
+    return c;
+  }
+
+  // 秒 → mm:ss / h:mm:ss
+  function fmtTimeOf(s){
+    if (!isFinite(s) || s < 0) s = 0;
+    var h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), sec = Math.floor(s % 60);
+    function p(n){ return n < 10 ? '0' + n : '' + n; }
+    return h > 0 ? h + ':' + p(m) + ':' + p(sec) : p(m) + ':' + p(sec);
+  }
+
+  // ---------- 渲染 ----------
+  // 手机上没法按返回键 / 面包屑太窄，顶栏给一个明确的「上一级」
+  function paintUp(){
+    var b = document.getElementById('upBtn');
+    if (b) b.hidden = !state.path;
+    // 同步「是否在子目录」给 TV 壳（Android 返回键要用它判断是回上一级还是退出）
+    var atRoot = !state.path;
+    try { if (window.__atRoot !== atRoot) { window.__atRoot = atRoot; if (window.TVBridge) window.TVBridge.setAtRoot(atRoot); } }
+    catch(e){}
+  }
+  function goUp(){
+    if (!state.path) return;
+    var p = state.path.split('/');
+    p.pop();
+    load(p.join('/'));
+  }
+  // 暴露给 TV 壳（Android 端在 onBackPressed 时调用，返回 true 表示已处理回上一级）
+  window.__tvGoUp = function(){
+    if (!state.path) return false;
+    goUp();
+    return true;
+  };
+  document.getElementById('upBtn').addEventListener('click', function(ev){
+    ev.stopPropagation();
+    goUp();
+  });
+
+  function renderSkeleton(){
+    grid.innerHTML = '';
+    for (var i = 0; i < 10; i++) grid.appendChild(el('div', 'skel'));
+  }
+
+  function renderCrumbs(crumbs){
+    crumbBox.innerHTML = '';
+    crumbs.forEach(function(c, i){
+      if (i) crumbBox.appendChild(el('span', 'sep', '›'));
+      var b = el('button', 'crumb' + (i === crumbs.length - 1 ? ' here' : ''), escapeHtml(c.name));
+      b.onclick = function(){ load(c.path); };
+      crumbBox.appendChild(b);
+    });
+  }
+
+  function renderFilters(){
+    var box = document.getElementById('filters');
+    box.innerHTML = '';
+    var counts = {all: state.entries.length, folder:0, video:0, audio:0, image:0, doc:0};
+    state.entries.forEach(function(e){
+      if (counts[e.kind] != null) counts[e.kind]++;
+      else if (e.kind !== 'folder') counts.doc++;
+    });
+
+    // 「历史」入口：固定在最上面，点开最近看过的影片
+    var hb = el('button', 'filter' + (state.kind === 'history' ? ' on' : ''),
+      '<span>🕘 历史</span><span class="n"></span>');
+    hb.tabIndex = 0;
+    hb.dataset.kind = 'history';
+    hb.onclick = function(){
+      state.kind = 'history';
+      renderFilters();
+      loadHistory();
+    };
+    box.appendChild(hb);
+
+    FILTERS.forEach(function(f){
+      var n = counts[f.id] || 0;
+      if (f.id !== 'all' && n === 0) return;
+      var b = el('button', 'filter' + (state.kind === f.id ? ' on' : ''),
+        '<span>' + f.label + '</span><span class="n">' + n + '</span>');
+      b.tabIndex = 0;
+      b.dataset.kind = f.id;
+      b.onclick = function(){
+        state.kind = f.id;
+        renderFilters();
+        applyFilter(true);
+        focusFirst();
+      };
+      box.appendChild(b);
+    });
+  }
+
+  function applyFilter(focus){
+    var list = state.entries;
+    if (state.kind !== 'all') list = list.filter(function(e){ return e.kind === state.kind; });
+    state.filtered = list;
+    grid.innerHTML = '';
+
+    if (!list.length) {
+      showEmpty(state.q ? '没找到匹配的文件' : '这个文件夹是空的',
+                state.q ? '换个关键词试试' : '把影片丢进共享目录，这里就会列出来');
+    } else {
+      list.forEach(function(e, i){
+        grid.appendChild(makeCard(e, i));
+      });
+    }
+    if (!state.q) {
+      statBox.innerHTML = '共 <b>' + list.length + '</b> 项' +
+        (state.kind !== 'all' ? '（已筛选）' : '') +
+        (state.path ? ' · <b>' + escapeHtml(state.path) + '</b>' : '');
+    }
+    if (focus) focusFirst();
+  }
+
+  function showEmpty(title, sub){
+    grid.innerHTML = '';
+    var d = el('div', 'empty',
+      '<svg viewBox="0 0 24 24"><path d="M3 7.5A2.5 2.5 0 0 1 5.5 5h4l2 2.5h7A2.5 2.5 0 0 1 21 10v7.5A2.5 2.5 0 0 1 18.5 20h-13A2.5 2.5 0 0 1 3 17.5z"/></svg>' +
+      '<p>' + escapeHtml(title) + '</p><small>' + escapeHtml(sub || '') + '</small>');
+    d.style.gridColumn = '1 / -1';
+    grid.appendChild(d);
+    statBox.innerHTML = '空';
+  }
+
+  // 把 [BeanSub&FZSD][BLEACH_...][27][GB][1080P][x264_AAC].mp4 这类压制组命名
+  // 压成人能看懂的样子：第 27 集 · BLEACH Sennen Kessen hen
+  function isTag(t){
+    if (/^\d{1,3}$/.test(t)) return true;                        // 纯集数
+    if (/^[\d.\s]+(gb|mb|gib)$/i.test(t)) return true;           // 体积
+    if (/字幕组|字幕社|压制|搬运|汉化/i.test(t)) return true;
+    if (/^(gb|big5|chs|cht|jpn|sc|tc|简体|繁体|简繁|中字|内嵌|双语|中日双语)$/i.test(t)) return true;
+    if (/(1080p|720p|2160p|4k|8k|web-?dl|webrip|bluray|bdrip|hdtv|x26[45]|h\.?26[45]|hevc|avc|aac|ac3|eac3|flac|ddp?5\.1|nvenc|10bit|hdr|sdr|mp4|mkv|avi)/i.test(t)) return true;
+    if (/sub$/i.test(t) || /fansub/i.test(t)) return true;       // XXSub
+    if (/^(bea?nsub|fzsd|lilith|sakurato|neko|dmhy|jysub|dmg|reino|vcb|moozzi|nsw|ohys|loli|kawaiika)/i.test(t)) return true;
+    return false;
+  }
+
+  function prettyName(e){
+    var base = e.dir ? e.name : e.name.replace(/\.[^.]+$/, '');
+    var ep = null;
+    if (!e.dir) {
+      var m = base.match(/\[(\d{1,3})\]/)
+           || base.match(/[Ss]\d{1,2}[Ee](\d{1,3})/)
+           || base.match(/第\s*(\d{1,3})\s*[集话話]/);
+      if (m) ep = parseInt(m[1], 10);
+    }
+    var kept = [];
+    var outside = base.replace(/\[([^\]]*)\]/g, function(_, inner){
+      var t = inner.trim();
+      if (t && !isTag(t)) kept.push(t);
+      return ' ';
+    });
+    var clean = (kept.join(' ') + ' ' + outside);
+    // 参数标签只对文件清洗；目录名里出现「1080P」这类字样是正常命名，别删
+    if (!e.dir) {
+      clean = clean
+        .replace(/\b[Ss]\d{1,2}[Ee]\d{1,3}\b/g, ' ')
+        .replace(/\b(2160p|1080p|720p|4k|8k|webrip|web-dl|web|bluray|bdrip|hdtv|x264|x265|h\.?264|h\.?265|hevc|avc|aac|ac3|eac3|ddp?5\.1|nvenc|10bit|hdr|sdr)\b/gi, ' ');
+    }
+    clean = clean
+      .replace(/[_.]+/g, ' ')
+      .replace(/\s{2,}/g, ' ')
+      .replace(/^[\s\-·]+|[\s\-·]+$/g, '');
+    if (clean.replace(/\s/g, '').length < 2) clean = base;
+    if (ep) return '第 ' + ep + ' 集' + (clean ? ' · ' + clean : '');
+    return clean;
+  }
+
+  function makeCard(e, idx){
+    var kind = e.kind || 'other';
+    var iconKey = ICONS[kind] ? kind : 'other';
+    var c = el('div', 'card k-' + kind);
+    c.tabIndex = 0;
+    c.dataset.idx = idx;
+    c.dataset.path = e.path;
+
+    var thumb = el('div', 'thumb');
+    if (kind === 'image') {
+      thumb.innerHTML = '<img loading="lazy" src="/media/' + encodeURI(e.path) + '" alt="">';
+    } else if (kind === 'video' && e.poster) {
+      // 有海报（同目录海报文件，或抽帧接口）就用图；加载失败自动退回图标
+      var img = new Image();
+      img.loading = 'lazy';
+      img.decoding = 'async';
+      img.alt = '';
+      img.className = 'poster';
+      img.onload = function(){ thumb.classList.add('has-poster'); };
+      img.onerror = function(){ img.remove(); };
+      img.src = e.poster;
+      thumb.appendChild(img);
+      thumb.appendChild(el('span', 'glow'));
+      var ico = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      ico.setAttribute('viewBox', '0 0 24 24');
+      ico.setAttribute('class', 'pic-ico');
+      ico.innerHTML = ICONS[iconKey];
+      thumb.appendChild(ico);
+    } else {
+      thumb.innerHTML = '<span class="glow"></span>' +
+        '<svg viewBox="0 0 24 24">' + ICONS[iconKey] + '</svg>';
+    }
+    if (e.ext && !e.dir) thumb.appendChild(el('span', 'badge', escapeHtml(e.ext)));
+    // 看过一部分的视频：缩略图底部进度条 + 左下角百分比，一眼知道续播哪集
+    if (!e.dir && e.progress && e.progress.pct > 0.01 && e.progress.pct < 0.99) {
+      var pct = Math.max(1, Math.round(e.progress.pct * 100));
+      thumb.appendChild(el('span', 'watchbar', '<i style="width:' + pct + '%"></i>'));
+      thumb.appendChild(el('span', 'watched', '看到 ' + pct + '%'));
+    }
+    c.appendChild(thumb);
+
+    var meta = el('div', 'meta');
+    var nameEl = el('div', 'name', escapeHtml(prettyName(e)));
+    nameEl.title = e.name;
+    meta.appendChild(nameEl);
+    var sub = el('div', 'sub');
+    sub.innerHTML = e.dir
+      ? '文件夹'
+      : (e.size_text + '<i>·</i>' + fmtTime(e.mtime));
+    meta.appendChild(sub);
+    c.appendChild(meta);
+
+    c.addEventListener('click', function(){ open(e); });
+    c.addEventListener('keydown', function(ev){
+      if (ev.keyCode === 13) { ev.preventDefault(); open(e); }
+    });
+    c.addEventListener('focus', function(){
+      var r = c.getBoundingClientRect();
+      var mr = main.getBoundingClientRect();
+      if (r.top < mr.top + 8) main.scrollTop += r.top - mr.top - 18;
+      else if (r.bottom > mr.bottom - 8) main.scrollTop += r.bottom - mr.bottom + 18;
+    });
+    return c;
+  }
+
+  function open(e){
+    if (e.dir) { load(e.path); return; }
+    if (e.kind === 'image') { openLightbox(e); return; }
+    if (e.kind === 'video' || e.kind === 'audio') {
+      // 直接进播放器（播放器内置选集面板，按菜单键弹出）
+      location.href = '/play?path=' + encPath(e.path) + '&title=' + encodeURIComponent(prettyName(e));
+      return;
+    }
+    location.href = '/download/' + encodeURI(e.path);
+  }
+
+  // ---------- 图片灯箱 ----------
+  function openLightbox(e){
+    boxList = state.filtered.filter(function(x){ return x.kind === 'image'; });
+    boxIdx = boxList.findIndex(function(x){ return x.path === e.path; });
+    if (boxIdx < 0) boxIdx = 0;
+    boximg.src = '/media/' + encodeURI(boxList[boxIdx].path);
+    lightbox.classList.add('on');
+  }
+  function stepBox(d){
+    if (!boxList.length) return;
+    boxIdx = (boxIdx + d + boxList.length) % boxList.length;
+    boximg.src = '/media/' + encodeURI(boxList[boxIdx].path);
+  }
+  window.stepBox = stepBox;
+  window.closeBox = function(){ lightbox.classList.remove('on'); boximg.src = ''; };
+
+  // ---------- 遥控器导航 ----------
+  function cards(){ return Array.prototype.slice.call(grid.querySelectorAll('.card')); }
+  function focusFirst(){
+    var list = cards();
+    if (list.length) list[0].focus();
+  }
+  function colsOf(list){
+    if (!list.length) return 1;
+    var top = list[0].offsetTop, n = 0;
+    for (var i = 0; i < list.length; i++) {
+      if (list[i].offsetTop === top) n++; else break;
+    }
+    return Math.max(1, n);
+  }
+  function moveTo(list, i){
+    if (i < 0) i = 0;
+    if (i >= list.length) i = list.length - 1;
+    list[i].focus();
+  }
+
+  // 顶栏里能被遥控器聚焦的元素（返回上级 / 面包屑 / 搜索），按视觉顺序
+  function topItems(){
+    var h = document.querySelector('header');
+    if (!h) return [];
+    var nodes = h.querySelectorAll('button, input');
+    var arr = [];
+    for (var i = 0; i < nodes.length; i++) {
+      var n = nodes[i];
+      if (n.hidden || n.disabled || n.offsetParent === null) continue;
+      arr.push(n);
+    }
+    return arr;
+  }
+  function focusTop(){
+    var items = topItems();
+    if (items.length) items[0].focus();
+  }
+
+  document.addEventListener('keydown', function(ev){
+    var tag = (ev.target.tagName || '').toUpperCase();
+    var inInput = tag === 'INPUT' || tag === 'TEXTAREA';
+
+    // 灯箱打开时只处理自己的按键
+    if (lightbox.classList.contains('on')) {
+      if (ev.key === 'ArrowLeft' || ev.keyCode === 37) { stepBox(-1); ev.preventDefault(); }
+      else if (ev.key === 'ArrowRight' || ev.keyCode === 39) { stepBox(1); ev.preventDefault(); }
+      else if (ev.key === 'Escape' || ev.keyCode === 27 || ev.keyCode === 8) { closeBox(); ev.preventDefault(); }
+      return;
+    }
+
+    var k = ev.key, code = ev.keyCode;
+
+    // 焦点在搜索框里：下键 / 回车 / Esc 都把焦点交回网格（同时收起键盘），
+    // 否则遥控器进了搜索框就出不来，只能整页刷新
+    if (inInput) {
+      if (k === 'ArrowDown' || code === 40) { qBox.blur(); focusFirst(); ev.preventDefault(); return; }
+      if (k === 'Enter' || code === 13) { qBox.blur(); focusFirst(); ev.preventDefault(); return; }
+      if (k === 'Escape' || code === 27) {
+        if (qBox.value) { qBox.value = ''; applyFilter(true); }
+        qBox.blur(); focusFirst();
+        ev.preventDefault(); return;
+      }
+      return;
+    }
+
+    // 焦点在顶栏（返回上级 / 面包屑 / 搜索）：左右走动，下键回网格
+    var act = document.activeElement;
+    if (act && act.closest && act.closest('header')) {
+      var ti = topItems();
+      var hi = ti.indexOf(act);
+      if (k === 'ArrowRight' || code === 39) { if (hi >= 0 && hi < ti.length - 1) ti[hi + 1].focus(); ev.preventDefault(); return; }
+      if (k === 'ArrowLeft' || code === 37) { if (hi > 0) ti[hi - 1].focus(); ev.preventDefault(); return; }
+      if (k === 'ArrowDown' || code === 40) { focusFirst(); ev.preventDefault(); return; }
+      if (k === 'ArrowUp' || code === 38) { ev.preventDefault(); return; }
+      if (k === 'Enter' || code === 13) { act.click(); ev.preventDefault(); return; }
+      return;
+    }
+
+    // 焦点在左侧分类栏时，上下切换分类、右键回网格
+    if (act && act.classList && act.classList.contains('filter')) {
+      var fl = Array.prototype.slice.call(document.querySelectorAll('.filter'));
+      var fi = fl.indexOf(act);
+      if (k === 'ArrowUp' || code === 38) { if (fi > 0) fl[fi - 1].focus(); ev.preventDefault(); return; }
+      if (k === 'ArrowDown' || code === 40) { if (fi < fl.length - 1) fl[fi + 1].focus(); ev.preventDefault(); return; }
+      if (k === 'ArrowRight' || code === 39) { focusFirst(); ev.preventDefault(); return; }
+      if (k === 'Enter' || code === 13) { act.click(); ev.preventDefault(); return; }
+      return;
+    }
+
+    var list = cards();
+    if (!list.length) return;
+    var cur = list.indexOf(document.activeElement);
+    var cols = colsOf(list);
+
+    if (k === 'ArrowRight' || code === 39) { moveTo(list, cur < 0 ? 0 : cur + 1); ev.preventDefault(); }
+    else if (k === 'ArrowLeft' || code === 37) {
+      if (cur >= 0 && cur % cols === 0) {
+        var onFilter = document.querySelector('.filter.on') || document.querySelector('.filter');
+        if (onFilter) onFilter.focus();
+      } else {
+        moveTo(list, cur < 0 ? 0 : cur - 1);
+      }
+      ev.preventDefault();
+    }
+    else if (k === 'ArrowDown' || code === 40) { moveTo(list, cur < 0 ? 0 : cur + cols); ev.preventDefault(); }
+    else if (k === 'ArrowUp' || code === 38) {
+      // 到顶了也别把按键放出去：一放出去 WebView 会把焦点挪到原生控件上，遥控器就"失灵"了。
+      // 第一行再往上 = 进顶栏（返回上级 / 路径 / 搜索），否则遥控器永远够不到那一排。
+      if (cur < cols) {
+        ev.preventDefault();
+        if (main.scrollTop > 10) { main.scrollTop = 0; return; }
+        focusTop();
+        return;
+      }
+      moveTo(list, cur < 0 ? 0 : cur - cols);
+      ev.preventDefault();
+    }
+    else if (k === 'Enter' || code === 13) {
+      if (cur < 0) { focusFirst(); } else { list[cur].click(); }
+      ev.preventDefault();
+    }
+    else if (k === 'Escape' || k === 'Backspace' || code === 27 || code === 8) {
+      ev.preventDefault();
+      if (state.path) {
+        var p = state.path.split('/');
+        p.pop();
+        load(p.join('/'));
+      }
+    }
+    else if (k === '/' ) { qBox.focus(); ev.preventDefault(); }
+  });
+
+  document.addEventListener('popstate', function(ev){
+    var p = (ev.state && ev.state.p) || new URLSearchParams(location.search).get('p') || '';
+    load(p, false);
+  });
+
+  // 鼠标点击空白处后，方向键仍要有落点
+  main.addEventListener('click', function(ev){
+    if (ev.target === main) focusFirst();
+  });
+
+  // 搜索防抖
+  var timer = null;
+  qBox.addEventListener('input', function(){
+    clearTimeout(timer);
+    var v = qBox.value.trim();
+    timer = setTimeout(function(){ search(v); }, 320);
+  });
+
+  // 全屏：把浏览器的地址栏和工具栏收起来，电视上能多出 20% 画面
+  document.getElementById('fsbtn').addEventListener('click', function(){
+    var el = document.documentElement;
+    var fsEl = document.fullscreenElement || document.webkitFullscreenElement;
+    try {
+      if (fsEl) { (document.exitFullscreen || document.webkitExitFullscreen).call(document); }
+      else if (el.requestFullscreen) { el.requestFullscreen(); }
+      else if (el.webkitRequestFullscreen) { el.webkitRequestFullscreen(); }
+    } catch (e) {}
+  });
+
+  // ==================== 上传功能 ====================
+  var fileInput = document.getElementById('fileInput');
+  var uploadPanel = document.getElementById('uploadPanel');
+  var uploadList = document.getElementById('uploadList');
+
+  document.getElementById('uploadBtn').addEventListener('click', function(){
+    fileInput.click();
+  });
+
+  fileInput.addEventListener('change', function(){
+    var files = Array.prototype.slice.call(fileInput.files);
+    if (!files.length) return;
+    uploadPanel.classList.add('on');
+    uploadList.innerHTML = '';
+    files.forEach(function(f, i){
+      var row = el('div', 'upload-row');
+      row.id = 'uprow-' + i;
+      row.innerHTML =
+        '<div class="fname" title="' + escapeHtml(f.name) + '">' + escapeHtml(f.name) + '</div>' +
+        '<div class="fsize">' + formatBytes(f.size) + '</div>' +
+        '<div class="pbar"><div class="pfill" id="upfill-' + i + '"></div></div>' +
+        '<div class="pstatus up" id="upstat-' + i + '">等待</div>';
+      uploadList.appendChild(row);
+    });
+    // 逐个上传
+    var queue = files.map(function(f, i){ return {file: f, idx: i}; });
+    uploadNext(queue, 0);
+    fileInput.value = '';
+  });
+
+  function formatBytes(n){
+    if (n < 1024) return n + ' B';
+    if (n < 1048576) return (n/1024).toFixed(1) + ' KB';
+    if (n < 1073741824) return (n/1048576).toFixed(1) + ' MB';
+    return (n/1073741824).toFixed(2) + ' GB';
+  }
+
+  function uploadNext(queue, qi){
+    if (qi >= queue.length) {
+      // 全部完成，刷新列表
+      load(state.path, false);
+      return;
+    }
+    var item = queue[qi];
+    var f = item.file;
+    var idx = item.idx;
+    var statEl = document.getElementById('upstat-' + idx);
+    var fillEl = document.getElementById('upfill-' + idx);
+
+    // 大文件分块上传（> 4MB），小文件单次传
+    var CHUNK_SIZE = 2 * 1024 * 1024;
+    if (f.size > CHUNK_SIZE * 2) {
+      uploadChunked(f, idx, statEl, fillEl, function(ok){
+        uploadNext(queue, qi + 1);
+      });
+    } else {
+      uploadSingle(f, idx, statEl, fillEl, function(ok){
+        uploadNext(queue, qi + 1);
+      });
+    }
+  }
+
+  function uploadSingle(f, idx, statEl, fillEl, done){
+    statEl.textContent = '上传中';
+    statEl.className = 'pstatus up';
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', '/api/upload?name=' + encodeURIComponent(f.name));
+    xhr.upload.onprogress = function(e){
+      if (e.lengthComputable) {
+        var pct = Math.round(e.loaded / e.total * 100);
+        fillEl.style.width = pct + '%';
+        statEl.textContent = pct + '%';
+      }
+    };
+    xhr.onload = function(){
+      try {
+        var r = JSON.parse(xhr.responseText);
+        if (r.ok) {
+          fillEl.style.width = '100%';
+          statEl.textContent = '✓ 完成';
+          statEl.className = 'pstatus done';
+        } else {
+          statEl.textContent = '失败';
+          statEl.className = 'pstatus err';
+        }
+      } catch(e) {
+        statEl.textContent = '失败';
+        statEl.className = 'pstatus err';
+      }
+      done();
+    };
+    xhr.onerror = function(){
+      statEl.textContent = '失败';
+      statEl.className = 'pstatus err';
+      done();
+    };
+    xhr.send(f);
+  }
+
+  function uploadChunked(f, idx, statEl, fillEl, done){
+    var CHUNK_SIZE = 2 * 1024 * 1024;
+    var total = Math.ceil(f.size / CHUNK_SIZE);
+    var uid = Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+    var chunk = 0;
+
+    statEl.textContent = '0%';
+    statEl.className = 'pstatus up';
+
+    function next(){
+      if (chunk >= total) {
+        fillEl.style.width = '100%';
+        statEl.textContent = '✓ 完成';
+        statEl.className = 'pstatus done';
+        done();
+        return;
+      }
+      var start = chunk * CHUNK_SIZE;
+      var end = Math.min(start + CHUNK_SIZE, f.size);
+      var blob = f.slice(start, end);
+      var xhr = new XMLHttpRequest();
+      xhr.open('POST', '/api/upload?name=' + encodeURIComponent(f.name) +
+        '&uid=' + uid + '&chunk=' + chunk + '&total=' + total);
+      xhr.onload = function(){
+        if (xhr.status === 200) {
+          chunk++;
+          var pct = Math.round(chunk / total * 100);
+          fillEl.style.width = pct + '%';
+          statEl.textContent = pct + '%';
+          next();
+        } else {
+          statEl.textContent = '失败';
+          statEl.className = 'pstatus err';
+          done();
+        }
+      };
+      xhr.onerror = function(){
+        statEl.textContent = '网络中断';
+        statEl.className = 'pstatus err';
+        done();
+      };
+      xhr.send(blob);
+    }
+    next();
+  }
+
+  window.closeUploadPanel = function(){
+    uploadPanel.classList.remove('on');
+    uploadList.innerHTML = '';
+  };
+
+  // ---------- 启动 ----------
+  var startPath = new URLSearchParams(location.search).get('p') || '';
+  history.replaceState({p: startPath}, '', location.href);
+  load(startPath, false);
+})();
+</script>
+</body>
+</html>

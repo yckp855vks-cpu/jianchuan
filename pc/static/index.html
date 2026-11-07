@@ -1,0 +1,3401 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#eceff5">
+<title>简传 Lite · 局域网传输</title>
+<script>
+/* 独立窗口（exe 双击打开）会在地址后面带 ?app=1。
+   这里在样式渲染前就把 win-app 挂到 html 上，顶栏位置不会先闪一下。 */
+try {
+  if (/[?&]app=1(&|$)/.test(location.search)) document.documentElement.classList.add('win-app');
+} catch (e) {}
+</script>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%233a6ff0'/%3E%3Cpath d='M8 16.5l16-7-4.6 7 4.6 7z' fill='white'/%3E%3C/svg%3E">
+<style>
+/* ============================ 雨窗玻璃 · 夜雨（默认） ============================ */
+:root{
+  --bg:transparent;
+  --panel:rgba(14,26,37,.46);
+  --panel-2:rgba(255,255,255,.065);
+  --line:rgba(170,208,232,.16);
+  --line-2:rgba(170,208,232,.10);
+  --text:#e4eef7;
+  --text-2:#9cb1c3;
+  --text-3:#6d8398;
+  --brand:#63b3ea;
+  --brand-2:#93d0f5;
+  --brand-soft:rgba(99,179,234,.16);
+  --brand-mid:rgba(99,179,234,.26);
+  --stream:rgba(5,12,19,.34);
+  --bubble:rgba(255,255,255,.095);
+  --bubble-line:rgba(178,216,240,.18);
+  --mine:#3d7fb0;
+  --shadow:0 22px 50px -26px rgba(0,0,0,.92), inset 0 1px 0 rgba(255,255,255,.11), inset 0 -1px 0 rgba(255,255,255,.035);
+  --shadow-sm:0 8px 22px -14px rgba(0,0,0,.9), inset 0 1px 0 rgba(255,255,255,.09);
+  --radius:20px;
+  --ok:#3ddc97;
+  --blur:20px;
+  --glow:rgba(99,179,234,.40);
+}
+
+/* ============================ 雨窗玻璃 · 晨雾（浅色） ============================ */
+[data-theme="light"]{
+  --panel:rgba(255,255,255,.58);
+  --panel-2:rgba(255,255,255,.45);
+  --line:rgba(255,255,255,.78);
+  --line-2:rgba(255,255,255,.52);
+  --text:#15222e;
+  --text-2:#51667a;
+  --text-3:#8296a6;
+  --brand:#2f7fb8;
+  --brand-2:#57a0d6;
+  --brand-soft:rgba(47,127,184,.12);
+  --brand-mid:rgba(47,127,184,.22);
+  --stream:rgba(255,255,255,.30);
+  --bubble:rgba(255,255,255,.74);
+  --bubble-line:rgba(255,255,255,.9);
+  --mine:#2f7fb8;
+  --shadow:0 16px 40px -20px rgba(28,48,68,.32), inset 0 1px 0 rgba(255,255,255,.92), inset 0 -1px 0 rgba(255,255,255,.28);
+  --shadow-sm:0 6px 18px -12px rgba(28,48,68,.38), inset 0 1px 0 rgba(255,255,255,.85);
+  --ok:#12b886;
+  --glow:rgba(47,127,184,.32);
+}
+
+/* ============================ 雨窗玻璃 · 薄荷（浅色青绿） ============================ */
+[data-theme="mint"]{
+  --panel:rgba(255,255,255,.60);
+  --panel-2:rgba(255,255,255,.48);
+  --line:rgba(198,234,222,.84);
+  --line-2:rgba(198,234,222,.56);
+  --text:#0f3129;
+  --text-2:#476b61;
+  --text-3:#7b9a91;
+  --brand:#0f9e8e;
+  --brand-2:#3ec1b0;
+  --brand-soft:rgba(15,158,142,.13);
+  --brand-mid:rgba(15,158,142,.24);
+  --stream:rgba(255,255,255,.32);
+  --bubble:rgba(255,255,255,.78);
+  --bubble-line:rgba(212,240,232,.95);
+  --mine:#0f9e8e;
+  --shadow:0 16px 40px -20px rgba(22,70,60,.30), inset 0 1px 0 rgba(255,255,255,.94), inset 0 -1px 0 rgba(255,255,255,.30);
+  --shadow-sm:0 6px 18px -12px rgba(22,70,60,.34), inset 0 1px 0 rgba(255,255,255,.88);
+  --ok:#0ea472;
+  --glow:rgba(15,158,142,.30);
+}
+
+/* ============================ 雨窗玻璃 · 暮紫（深色紫罗兰） ============================ */
+[data-theme="dusk"]{
+  --panel:rgba(30,22,46,.52);
+  --panel-2:rgba(255,255,255,.075);
+  --line:rgba(199,178,240,.17);
+  --line-2:rgba(199,178,240,.10);
+  --text:#eee6fa;
+  --text-2:#b3a4c9;
+  --text-3:#84769b;
+  --brand:#a78bfa;
+  --brand-2:#c6b2ff;
+  --brand-soft:rgba(167,139,250,.17);
+  --brand-mid:rgba(167,139,250,.30);
+  --stream:rgba(12,8,22,.36);
+  --bubble:rgba(255,255,255,.10);
+  --bubble-line:rgba(206,188,245,.19);
+  --mine:#7c5cd6;
+  --shadow:0 22px 50px -26px rgba(0,0,0,.92), inset 0 1px 0 rgba(255,255,255,.12), inset 0 -1px 0 rgba(255,255,255,.04);
+  --shadow-sm:0 8px 22px -14px rgba(0,0,0,.9), inset 0 1px 0 rgba(255,255,255,.10);
+  --ok:#5fd98f;
+  --glow:rgba(167,139,250,.42);
+}
+
+/* ============================ 雨窗玻璃 · 橘霞（浅橙叠浅红） ============================ */
+[data-theme="sunset"]{
+  --panel:rgba(255,255,255,.62);
+  --panel-2:rgba(255,255,255,.50);
+  --line:rgba(255,222,209,.88);
+  --line-2:rgba(255,222,209,.58);
+  --text:#43241a;
+  --text-2:#6f4a3c;
+  --text-3:#a3796a;
+  --brand:#ef6a3d;
+  --brand-2:#ff8d5d;
+  --brand-soft:rgba(239,106,61,.13);
+  --brand-mid:rgba(239,106,61,.26);
+  --stream:rgba(255,255,255,.32);
+  --bubble:rgba(255,255,255,.80);
+  --bubble-line:rgba(255,234,224,.96);
+  --mine:#ef6a3d;
+  --shadow:0 16px 40px -20px rgba(112,44,26,.28), inset 0 1px 0 rgba(255,255,255,.95), inset 0 -1px 0 rgba(255,255,255,.32);
+  --shadow-sm:0 6px 18px -12px rgba(112,44,26,.34), inset 0 1px 0 rgba(255,255,255,.90);
+  --ok:#12b886;
+  --glow:rgba(239,106,61,.34);
+}
+
+*{box-sizing:border-box}
+html,body{height:100%}
+html{
+  background:
+    radial-gradient(56% 44% at 78% 82%,rgba(158,206,240,.26),transparent 70%),
+    radial-gradient(42% 38% at 18% 14%,rgba(80,128,168,.22),transparent 72%),
+    linear-gradient(162deg,#0d1a26 0%,#182a37 34%,#21384a 62%,#0e1e2b 100%);
+  background-attachment:fixed;
+}
+html[data-theme="light"]{
+  background:
+    radial-gradient(54% 44% at 76% 82%,rgba(255,255,255,.9),transparent 70%),
+    radial-gradient(40% 36% at 20% 16%,rgba(196,222,242,.55),transparent 72%),
+    linear-gradient(162deg,#dfe9f2 0%,#ebf2f8 38%,#d9e6f0 70%,#eef5fa 100%);
+  background-attachment:fixed;
+}
+html[data-theme="mint"]{
+  background:
+    radial-gradient(54% 44% at 76% 82%,rgba(255,255,255,.92),transparent 70%),
+    radial-gradient(40% 36% at 20% 16%,rgba(188,236,222,.58),transparent 72%),
+    linear-gradient(162deg,#ddf0e9 0%,#e9f7f2 38%,#d3eae2 70%,#eefaf6 100%);
+  background-attachment:fixed;
+}
+html[data-theme="dusk"]{
+  background:
+    radial-gradient(56% 44% at 78% 82%,rgba(178,140,242,.26),transparent 70%),
+    radial-gradient(42% 38% at 18% 14%,rgba(120,86,186,.24),transparent 72%),
+    linear-gradient(162deg,#120e1e 0%,#1d1530 34%,#2a1f42 62%,#130f21 100%);
+  background-attachment:fixed;
+}
+/* 橘霞：一层浅橙压在左下、一层浅红叠在右上，斜向晕开的暖色 */
+html[data-theme="sunset"]{
+  background:
+    radial-gradient(52% 44% at 74% 80%,rgba(255,166,116,.62),transparent 70%),
+    radial-gradient(48% 42% at 20% 16%,rgba(255,146,150,.54),transparent 72%),
+    linear-gradient(158deg,#fff3e8 0%,#ffe9e0 34%,#ffdcd9 64%,#fff1ea 100%);
+  background-attachment:fixed;
+}
+body{
+  margin:0;background:var(--bg);color:var(--text);
+  font-family:"PingFang SC","Microsoft YaHei","Segoe UI",system-ui,-apple-system,sans-serif;
+  font-size:14px;line-height:1.55;-webkit-font-smoothing:antialiased;
+  overflow:hidden;
+}
+/* 第一层：窗外的灯，隔着水汽只剩一团团弥散的光 */
+body::before{
+  content:'';position:fixed;inset:-14%;z-index:-2;pointer-events:none;
+  background:
+    radial-gradient(30% 26% at 78% 82%,rgba(206,234,255,.58),transparent 68%),
+    radial-gradient(22% 20% at 16% 20%,rgba(136,184,220,.42),transparent 70%),
+    radial-gradient(30% 20% at 38% 95%,rgba(86,134,178,.28),transparent 72%),
+    radial-gradient(34% 30% at 52% 42%,rgba(120,168,205,.22),transparent 74%),
+    radial-gradient(14% 12% at 52% 46%,rgba(150,190,220,.16),transparent 72%);
+  filter:blur(38px);
+  animation:drift 34s ease-in-out infinite alternate;
+}
+[data-theme="light"] body::before{
+  background:
+    radial-gradient(26% 22% at 78% 82%,rgba(255,255,255,.95),transparent 68%),
+    radial-gradient(18% 16% at 16% 20%,rgba(206,230,246,.7),transparent 70%),
+    radial-gradient(30% 20% at 38% 95%,rgba(184,214,238,.55),transparent 72%);
+}
+[data-theme="mint"] body::before{
+  background:
+    radial-gradient(26% 22% at 78% 82%,rgba(255,255,255,.96),transparent 68%),
+    radial-gradient(18% 16% at 16% 20%,rgba(180,236,218,.72),transparent 70%),
+    radial-gradient(30% 20% at 38% 95%,rgba(152,220,200,.55),transparent 72%);
+}
+[data-theme="dusk"] body::before{
+  background:
+    radial-gradient(30% 26% at 78% 82%,rgba(216,186,255,.50),transparent 68%),
+    radial-gradient(22% 20% at 16% 20%,rgba(150,116,220,.40),transparent 70%),
+    radial-gradient(30% 20% at 38% 95%,rgba(96,64,160,.30),transparent 72%),
+    radial-gradient(34% 30% at 52% 42%,rgba(140,104,205,.22),transparent 74%);
+}
+/* 橘霞：橙与红两团光互相渗透，看着像落日压在玻璃上 */
+[data-theme="sunset"] body::before{
+  background:
+    radial-gradient(30% 26% at 76% 84%,rgba(255,196,142,.72),transparent 68%),
+    radial-gradient(24% 22% at 18% 18%,rgba(255,164,164,.66),transparent 70%),
+    radial-gradient(30% 20% at 42% 96%,rgba(255,172,124,.52),transparent 72%),
+    radial-gradient(34% 30% at 58% 40%,rgba(255,178,150,.40),transparent 74%),
+    radial-gradient(16% 14% at 52% 50%,rgba(255,206,178,.34),transparent 72%);
+}
+/* 第二层：玻璃表面的水珠和水痕（JS 随机生成，见 paintRain()） */
+body::after{
+  content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;
+  background-image:var(--rain,none);
+  background-size:cover;background-position:center;
+  opacity:.92;
+}
+[data-theme="light"] body::after{opacity:.42}
+[data-theme="light"] .panel::before{opacity:.10}
+[data-theme="mint"] body::after{opacity:.38}
+[data-theme="mint"] .panel::before{opacity:.10}
+[data-theme="dusk"] body::after{opacity:.90}
+[data-theme="dusk"] .panel::before{opacity:.14}
+[data-theme="sunset"] body::after{opacity:.40}
+[data-theme="sunset"] .panel::before{opacity:.11}
+@keyframes drift{
+  from{transform:translate3d(0,0,0) scale(1)}
+  to{transform:translate3d(1.6%,-1.3%,0) scale(1.06)}
+}
+@media (prefers-reduced-motion: reduce){
+  body::before{animation:none}
+}
+button{font-family:inherit;color:inherit;border:0;background:none;cursor:pointer;padding:0}
+a{color:var(--brand);text-decoration:none}
+svg{display:block}
+
+/* 登录遮罩 */
+.login-mask{
+  position:fixed;inset:0;z-index:200;display:none;place-items:center;
+  background:rgba(5,10,16,.55);backdrop-filter:blur(18px);padding:20px;
+}
+.login-mask.on{display:grid}
+.login-card{
+  width:100%;max-width:360px;text-align:center;
+  background:var(--panel);border:1px solid var(--line);
+  border-radius:22px;padding:34px 30px 28px;
+  box-shadow:0 30px 80px -30px rgba(0,0,0,.8), inset 0 1px 0 rgba(255,255,255,.12);
+  backdrop-filter:blur(20px);
+  animation:pop .25s cubic-bezier(.2,.8,.3,1);
+}
+.login-logo{
+  width:56px;height:56px;margin:0 auto 14px;border-radius:16px;
+  background:linear-gradient(145deg,#4a7bff,#2a56d8);color:#fff;
+  display:grid;place-items:center;box-shadow:0 10px 24px -10px rgba(58,111,240,.8);
+}
+.login-card h3{margin:0 0 4px;font-size:18px}
+.login-sub{font-size:12px;color:var(--text-3);margin-bottom:18px}
+.login-card input{
+  width:100%;height:44px;border-radius:12px;border:1px solid var(--line);
+  background:var(--panel-2);color:var(--text);font-size:14px;text-align:center;
+  outline:none;padding:0 14px;font-family:inherit;
+}
+.login-card input:focus{border-color:var(--brand);box-shadow:0 0 0 3px var(--brand-soft)}
+.login-card button{
+  width:100%;height:44px;margin-top:12px;border-radius:12px;
+  background:var(--brand);color:#fff;font-size:14px;font-weight:600;transition:.16s;
+}
+.login-card button:hover{background:var(--brand-2)}
+.login-card button:disabled{opacity:.5;cursor:not-allowed}
+.login-err{font-size:12px;color:#f2555a;margin-top:12px;min-height:16px}
+
+/* 连接模式开关
+   整卡可点 + 悬停染色 + 开关滑块预移，让人一眼知道「这块能拨」 */
+.mode-card{
+  background:var(--panel-2);border:1px solid var(--line);
+  border-radius:14px;padding:11px 13px;margin-bottom:12px;
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  cursor:pointer;user-select:none;
+  transition:border-color .18s,box-shadow .18s,background .18s,transform .18s;
+}
+.mode-card:hover{
+  border-color:var(--brand);background:var(--panel);
+  box-shadow:0 0 0 3px var(--brand-soft);transform:translateY(-1px);
+}
+.mode-card:active{transform:translateY(0)}
+.mode-row{display:flex;align-items:center;justify-content:space-between;gap:10px}
+/* 左栏最窄只有 208px（卡片内容区 ~148px），而开关是 flex:none 的 40px。
+   以前 .mode-label 没写 min-width:0，默认 min-width:auto 让它拒绝收缩，
+   一行放不下就整体往右顶 —— 表现是开关被挤出卡片右边缘、被 .rail 裁掉半个。
+   让 label 可收缩 + 标题可省略，才是不会溢出的写法。 */
+.mode-label{flex:1;min-width:0}
+.mode-title{font-size:13px;font-weight:600;display:flex;align-items:center;gap:6px;
+  white-space:nowrap;min-width:0}
+.mode-title>span:not(.mode-dot):not(.mode-badge){white-space:nowrap;
+  overflow:hidden;text-overflow:ellipsis;min-width:0}
+/* 状态胶囊：光有开关还是不知道开没开，配一句文字最省事 */
+.mode-badge{
+  font-size:9.5px;font-weight:600;line-height:1;padding:3px 6px;border-radius:6px;
+  background:rgba(120,140,160,.15);color:var(--text-3);
+  transition:background .2s,color .2s;white-space:nowrap;
+}
+.mode-card.pub .mode-badge{background:var(--brand-soft);color:var(--brand)}
+.mode-card.busy .mode-badge{background:rgba(120,140,160,.15);color:var(--text-2)}
+.mode-dot{width:6px;height:6px;border-radius:50%;background:#3ecf8e;flex:none;transition:background .2s}
+.mode-card.pub .mode-dot{background:var(--brand)}
+.mode-card.busy .mode-dot{background:var(--brand);animation:modePulse 1s ease-in-out infinite}
+@keyframes modePulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.75)}}
+.mode-sub{font-size:11px;color:var(--text-3);margin-top:2px;transition:color .2s;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mode-card:hover .mode-sub{color:var(--text-2)}
+.switch{position:relative;display:inline-block;width:40px;height:22px;flex:none}
+.switch input{opacity:0;width:0;height:0}
+/* 关态轨道用中性灰，**不要再用 --line**。以前取 --line，晨雾下是
+   rgba(255,255,255,.78)，白轨道 + 白滑块在白卡片上等于隐身，
+   用户既看不出这是开关、也看不出关着。灰=关、品牌色=开是通用语意。 */
+.switch .slider{position:absolute;inset:0;cursor:pointer;border-radius:22px;
+  background:#c3ccd6;transition:background .22s}
+[data-theme="dusk"] .switch .slider{background:rgba(255,255,255,.22)}
+.switch .slider:before{
+  content:'';position:absolute;width:16px;height:16px;left:3px;top:3px;border-radius:50%;
+  background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.32);
+  transition:transform .24s cubic-bezier(.34,1.35,.64,1);
+}
+.switch input:checked + .slider{background:var(--brand)}
+.switch input:checked + .slider:before{transform:translateX(18px)}
+/* 悬停时滑块先挪一点点：制造「可以拨过去」的暗示 */
+.mode-card:hover .switch input:not(:checked) + .slider:before{transform:translateX(3px)}
+.mode-card:hover .switch input:checked + .slider:before{transform:translateX(20px)}
+.mode-card.busy .switch input + .slider{opacity:.7}
+.mode-url{
+  max-height:0;opacity:0;overflow:hidden;
+  display:flex;flex-direction:column;align-items:stretch;gap:7px;
+  margin-top:0;padding-top:0;border-top:1px dashed transparent;
+  transition:max-height .26s ease,opacity .2s ease,margin .26s ease,padding .26s ease;
+}
+.mode-card.pub .mode-url{
+  max-height:56px;opacity:1;margin-top:10px;padding-top:9px;
+  border-top-color:var(--line-2);
+}
+.mu-line{display:flex;align-items:center;gap:6px;min-width:0}
+/* 密码行常驻，跟公网地址那行的展开动画无关 */
+.mode-pwd{margin-top:9px;padding-top:8px;border-top:1px dashed var(--line-2)}
+.pub-url{
+  flex:1;min-width:0;font-size:11px;color:var(--brand);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+/* 密码那行：和地址同样宽，但用等宽字形 + 常规文字色，不跟品牌色抢注意力 */
+.pwd-k{font-size:10.5px;color:var(--text-3);flex:none}
+.pwd-v{
+  flex:1;min-width:0;font-size:11px;color:var(--text-2);
+  font-family:ui-monospace,SFMono-Regular,Consolas,monospace;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  user-select:all;cursor:text;
+}
+
+/* 设置面板 */
+.set-row{margin-top:12px;text-align:left}
+.set-row label{display:block;font-size:12px;color:var(--text-2);margin-bottom:5px;font-weight:600}
+.set-row input{
+  width:100%;height:38px;border-radius:10px;border:1px solid var(--line);
+  background:var(--panel-2);color:var(--text);font-size:13px;padding:0 11px;outline:none;font-family:inherit;
+}
+.set-row input:focus{border-color:var(--brand);box-shadow:0 0 0 3px var(--brand-soft)}
+.set-hint{font-size:10.5px;color:var(--text-3);margin-top:5px;line-height:1.6}
+.set-save{
+  width:100%;height:40px;margin-top:16px;border-radius:11px;
+  background:var(--brand);color:#fff;font-size:13.5px;font-weight:600;transition:.16s;
+}
+.set-save:hover{background:var(--brand-2)}
+/* 弹窗里的次要按钮：不抢主按钮的注意力 */
+.apk-copy{
+  width:100%;height:34px;margin-top:8px;border-radius:10px;
+  background:transparent;border:1px solid var(--line-2);color:var(--text-2);
+  font-family:inherit;font-size:12.5px;cursor:pointer;transition:.16s;
+}
+.apk-copy:hover{border-color:var(--brand-mid);color:var(--brand)}
+
+/* ---------------- 布局 ---------------- */
+.app{
+  height:100vh;padding:14px;display:grid;gap:14px;
+  grid-template-columns:252px minmax(0,1fr);
+}
+.panel{
+  background:var(--panel);border-radius:var(--radius);
+  border:1px solid var(--line);
+  box-shadow:var(--shadow);min-height:0;
+  backdrop-filter:blur(var(--blur)) saturate(155%) brightness(.98);
+  -webkit-backdrop-filter:blur(var(--blur)) saturate(155%) brightness(.98);
+  position:relative;overflow:hidden;
+}
+/* 面板表面也挂一层水珠（和背景同一张图、同一视口定位，看起来像同一块玻璃） */
+.panel::before{
+  content:'';position:absolute;inset:0;z-index:0;pointer-events:none;
+  background-image:var(--rain,none);
+  background-size:cover;
+  background-attachment:fixed;
+  background-position:center;
+  opacity:.17;
+  border-radius:inherit;
+}
+.panel > *{position:relative;z-index:1}
+
+/* ---------------- 左栏 ---------------- */
+.rail{display:flex;flex-direction:column;padding:20px 16px 16px;
+  overflow-y:auto;overflow-x:hidden;
+  /* 滚动条要藏起来。窗口矮到装不下时左栏确实需要能滚，但 Chromium 在 Windows 上
+     画的是系统经典滚动条（深灰色一条 + 上下箭头），压在这块半透明磨砂栏上非常难看。
+     scrollbar-width:none 管 Firefox，::-webkit-scrollbar 管 WebView2/Chromium；
+     滚轮和触控板照样能滚，只是不画轨道。 */
+  scrollbar-width:none;-ms-overflow-style:none}
+.rail::-webkit-scrollbar{width:0;height:0;display:none}
+/* 窗口矮的时候（720p 笔记本最常见）左栏内容放不下，flex 会从上往下把每一块
+   压扁 —— 表现是剪贴板那条被挤成半行、二维码卡被裁掉一截。
+   子项一律不参与压缩，装不下就整条栏滚动。 */
+.rail>*{flex:none}
+.brand{display:flex;align-items:center;gap:11px}
+.logo{
+  width:42px;height:42px;border-radius:13px;flex:none;
+  background:linear-gradient(145deg,#4a7bff,#2a56d8);
+  display:grid;place-items:center;color:#fff;
+  box-shadow:0 6px 16px -6px rgba(58,111,240,.75);
+}
+.brand-name{font-size:15px;font-weight:700;letter-spacing:.2px}
+.brand-sub{font-size:11.5px;color:var(--text-3);margin-top:1px}
+.rail-nav{margin-top:26px;display:flex;flex-direction:column;gap:4px}
+.nav-item{
+  display:flex;align-items:center;gap:10px;padding:9px 11px;border-radius:11px;
+  font-size:13px;color:var(--text-2);transition:.16s;text-align:left;width:100%;
+}
+.nav-item:hover{background:var(--panel-2);color:var(--text)}
+.nav-item.active{background:var(--brand-soft);color:var(--brand);font-weight:600}
+.nav-item .badge{
+  margin-left:auto;font-size:11px;padding:1px 7px;border-radius:20px;
+  background:var(--brand);color:#fff;font-weight:600;
+}
+.nav-item.active .badge{background:var(--brand)}
+.rail-foot{margin-top:auto}
+.rail-actions{display:flex;gap:8px;margin-bottom:14px}
+.round{
+  width:34px;height:34px;border-radius:50%;display:grid;place-items:center;
+  background:var(--panel-2);color:var(--text-2);transition:.16s;
+}
+.round:hover{background:var(--brand-soft);color:var(--brand);transform:translateY(-1px)}
+.rail-meta{font-size:11.5px;color:var(--text-3);line-height:1.9}
+.rail-meta b{color:var(--text-2);font-weight:600}
+.rail-meta .split{height:1px;background:var(--line-2);margin:10px 0}
+
+/* ---------------- 中栏 ---------------- */
+.chat{display:flex;flex-direction:column;overflow:hidden}
+.chat-head{
+  height:54px;flex:none;display:flex;align-items:center;gap:10px;
+  padding:0 16px 0 20px;border-bottom:1px solid var(--line-2);
+}
+/* 状态灯三态：灰=未连接（静止）/ 绿=局域网 / 蓝=公网（后两者呼吸）。
+   呼吸**只动 transform + opacity** —— 这两样走 GPU 合成层，主线程零参与，
+   手机实测测不出耗电。切态时的颜色变化是 transition 一次性过渡，不是循环动画。
+   千万别把循环动画改成 background-color / box-shadow：那是每帧重绘，真耗电。
+   默认就是灰：没确认连上之前，就是没连上。 */
+.dot{
+  width:8px;height:8px;border-radius:50%;flex:none;
+  background:#8296a6;box-shadow:0 0 0 3px rgba(130,150,166,.16);
+  transition:background .3s, box-shadow .3s;
+}
+/* 呼吸幅度刻意收窄（1→.62，而不是电脑端那种 1→.42）：
+   这个点只有 8px，绿和蓝全靠色相区分，一旦透明度压太狠，谷底那一帧
+   蓝和灰在肉眼上几乎一样 —— 实测截图验证过。宁可不那么"飘"，也要让颜色随时读得出来。 */
+.dot.lan{
+  background:var(--ok);
+  box-shadow:0 0 0 3px color-mix(in srgb, var(--ok) 26%, transparent);
+  animation:dotBreath 2.4s ease-in-out infinite;
+}
+.dot.wan{
+  background:var(--brand);
+  box-shadow:0 0 0 3px color-mix(in srgb, var(--brand) 26%, transparent);
+  animation:dotBreath 2.4s ease-in-out infinite;
+}
+@keyframes dotBreath{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.62;transform:scale(.84)}}
+/* 刻意**不**用 document.hidden 去暂停这个动画：这个 WebView 里 hidden 会偶发
+   误判为 true 且一直挂着（之前「手机收不到消息」就是它造成的）。一旦误判，
+   绿灯就永久不呼吸，看着像坏了 —— 用一个假故障换那点根本不存在的电，不划算。
+   页面不可见时浏览器本来就会降帧/暂停合成，不需要手动管。 */
+@media (prefers-reduced-motion:reduce){.dot.lan,.dot.wan{animation:none}}
+.chan{font-size:13px;color:var(--text-2);display:flex;align-items:center;gap:8px}
+.chan b{color:var(--text);font-weight:600}
+.chan.lost b{color:var(--text-3)}
+.head-right{margin-left:auto;display:flex;align-items:center;gap:4px}
+.icon-btn{
+  width:32px;height:32px;border-radius:9px;display:grid;place-items:center;
+  color:var(--text-3);transition:.16s;
+}
+.icon-btn:hover{background:var(--panel-2);color:var(--text)}
+.search-wrap{position:relative;width:0;overflow:hidden;transition:width .22s ease}
+.search-wrap.open{width:168px;margin-right:6px}
+.search-wrap input{
+  width:100%;height:30px;border-radius:9px;border:1px solid var(--line);
+  background:var(--panel-2);color:var(--text);font-size:12.5px;padding:0 10px;outline:none;
+  font-family:inherit;
+}
+.search-wrap input:focus{border-color:var(--brand)}
+
+.stream{
+  flex:1;min-height:0;overflow-y:auto;background:var(--stream);scroll-behavior:smooth;
+  box-shadow:inset 0 2px 10px -8px rgba(46,64,110,.45);
+}
+.stream-inner{
+  max-width:768px;margin:0 auto;padding:22px 22px 10px;
+  display:flex;flex-direction:column;gap:16px;min-height:100%;
+}
+.stream::-webkit-scrollbar{width:9px}
+.stream::-webkit-scrollbar-thumb{background:color-mix(in srgb, var(--text-3) 34%, transparent);border-radius:8px;border:3px solid transparent;background-clip:content-box}
+.stream::-webkit-scrollbar-thumb:hover{background:color-mix(in srgb, var(--text-3) 58%, transparent);background-clip:content-box}
+
+/* 时间分隔 */
+.stamp{
+  align-self:center;font-size:11.5px;color:var(--text-2);padding:3px 12px;border-radius:20px;
+  background:var(--bubble);border:1px solid var(--bubble-line);
+  box-shadow:0 3px 10px -8px rgba(46,64,110,.5);
+  font-variant-numeric:tabular-nums;
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+}
+
+/* 消息 */
+.msg{display:flex;flex-direction:column;align-items:flex-start;gap:6px;animation:rise .26s cubic-bezier(.22,.7,.35,1)}
+.msg.mine{align-items:flex-end}
+@keyframes rise{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
+.bubble{
+  max-width:82%;border-radius:18px;position:relative;
+  background:var(--bubble);border:1px solid var(--bubble-line);box-shadow:var(--shadow-sm);
+  backdrop-filter:blur(10px) saturate(160%);
+  -webkit-backdrop-filter:blur(10px) saturate(160%);
+}
+.bubble.text{
+  padding:10px 14px;font-size:14px;line-height:1.62;white-space:pre-wrap;word-break:break-word;
+  border-bottom-left-radius:6px;
+}
+.msg.mine .bubble.text{
+  background:linear-gradient(150deg,rgba(108,180,228,.94),rgba(44,108,152,.95));
+  border-color:rgba(190,228,250,.42);color:#fff;border-radius:18px;border-bottom-right-radius:6px;
+  box-shadow:0 12px 28px -14px var(--glow), inset 0 1px 0 rgba(255,255,255,.45);
+}
+.msg.mine .bubble.text a{color:#dbe6ff}
+.bubble.text a{text-decoration:underline;text-underline-offset:2px;word-break:break-all}
+
+/* 文件卡片 */
+.bubble.file{
+  padding:11px;display:flex;align-items:center;gap:12px;
+  border-bottom-left-radius:5px;max-width:82%;min-width:280px;
+}
+.msg.mine .bubble.file{border-bottom-left-radius:16px;border-bottom-right-radius:5px}
+.thumb{
+  width:84px;height:84px;border-radius:11px;flex:none;overflow:hidden;cursor:pointer;
+  background:var(--panel-2);display:grid;place-items:center;position:relative;
+}
+.thumb img{width:100%;height:100%;object-fit:cover;transition:transform .3s}
+.thumb:hover img{transform:scale(1.06)}
+.thumb .ext{font-size:12px;font-weight:700;letter-spacing:.5px;color:var(--text-3);text-transform:uppercase}
+.thumb video{width:100%;height:100%;object-fit:cover;background:#08121a}
+.thumb.audio{background:linear-gradient(145deg,#3a719e,#16374f);color:#cfe8ff}
+.thumb.audio .audio-glyph{width:30px;height:30px;opacity:.92}
+.thumb .play-badge{
+  position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  width:30px;height:30px;border-radius:50%;pointer-events:none;
+  background:rgba(255,255,255,.92);color:#12314a;
+  display:grid;place-items:center;
+  box-shadow:0 4px 14px rgba(0,0,0,.45);
+  transition:transform .18s,background .18s;
+}
+.thumb .play-badge svg{width:13px;height:13px;margin-left:2px}
+.thumb:hover .play-badge{transform:translate(-50%,-50%) scale(1.1);background:#fff}
+.thumb .play-badge.small{
+  left:auto;right:5px;top:auto;bottom:5px;transform:none;
+  width:20px;height:20px;background:rgba(255,255,255,.22);color:#fff;box-shadow:none;
+  backdrop-filter:blur(6px);
+}
+.thumb .play-badge.small svg{width:10px;height:10px;margin-left:1px}
+.thumb:hover .play-badge.small{transform:none;background:rgba(255,255,255,.4)}
+.finfo{min-width:0;flex:1;padding-right:2px}
+.fname{
+  font-size:13.5px;font-weight:550;line-height:1.4;color:var(--text);
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+  word-break:break-all;
+}
+.fsize{font-size:11.5px;color:var(--text-3);margin-top:5px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.fsize .tag{background:var(--panel-2);padding:0 6px;border-radius:5px;color:var(--text-3);font-size:10.5px}
+.fsize .fdate{
+  font-size:10.5px;color:var(--text-2);font-variant-numeric:tabular-nums;
+  padding:1px 7px;border-radius:6px;background:var(--brand-soft);white-space:nowrap;
+}
+.dl{
+  width:36px;height:36px;border-radius:50%;flex:none;display:grid;place-items:center;
+  background:var(--panel-2);color:var(--text-2);transition:.18s;
+  /* 电脑端是 <a download>，手机 App 里是「打开」的 <button>，两者共用这套外观 */
+  border:0;padding:0;font:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent;
+}
+.dl:hover{background:var(--brand);color:#fff;transform:translateY(-1px)}
+
+/* 在文件夹中显示：比下载钮小一号，避免两个大圆钮挤在一起 */
+.rv{
+  width:30px;height:30px;border-radius:50%;flex:none;display:grid;place-items:center;
+  background:var(--panel-2);color:var(--text-2);transition:.18s;cursor:pointer;
+  border:none;padding:0;
+}
+.rv:hover{background:var(--brand);color:#fff;transform:translateY(-1px)}
+.rv:disabled{opacity:.45;cursor:default;transform:none}
+.rv-mini{
+  display:inline-grid;place-items:center;width:18px;height:18px;border-radius:5px;
+  vertical-align:-3px;margin-left:4px;color:var(--text-3);background:none;border:none;
+  cursor:pointer;padding:0;transition:.15s;
+}
+.rv-mini:hover{background:var(--brand-soft);color:var(--brand)}
+
+.meta{
+  font-size:11px;color:var(--text-3);display:flex;align-items:center;gap:6px;padding:0 3px;
+  opacity:.92;
+}
+.meta .me-tag{color:var(--brand);font-weight:600}
+.meta .act{
+  width:18px;height:18px;border-radius:6px;display:grid;place-items:center;
+  color:var(--text-3);opacity:0;transition:.15s;flex:none;
+}
+.msg:hover .meta .act{opacity:1}
+.meta .act.copy{opacity:.34}
+.meta .act:hover{background:var(--brand-soft);color:var(--brand)}
+.meta .act.del:hover{background:rgba(242,85,90,.18);color:#f2555a}
+/* 手机没有鼠标悬停：按钮常显，并放大到手指好点的尺寸 */
+@media (hover: none){
+  .meta .act{opacity:.6;width:24px;height:24px}
+  .meta .act svg{width:14px;height:14px}
+}
+
+/* 空状态 */
+.empty{
+  margin:auto;text-align:center;color:var(--text-3);padding:40px 20px;
+  display:flex;flex-direction:column;align-items:center;gap:14px;
+}
+.empty .ring{
+  width:72px;height:72px;border-radius:24px;display:grid;place-items:center;
+  background:var(--panel);border:1px solid var(--line);box-shadow:var(--shadow-sm);color:var(--brand);
+}
+.empty h3{margin:0;font-size:15px;color:var(--text-2);font-weight:600}
+.empty p{margin:0;font-size:12.5px;line-height:1.9}
+
+/* 拖拽提示：贴窗口一圈虚线，暗示"整个窗口都能接" */
+.drop-mask{
+  position:fixed;inset:0;z-index:60;display:none;place-items:center;
+  background:color-mix(in srgb, var(--brand) 10%, rgba(8,12,20,.38));
+  backdrop-filter:blur(2px);
+}
+.drop-mask.on{display:grid;animation:fadeIn .16s ease-out}
+.drop-mask::before{
+  content:'';position:absolute;inset:14px;border-radius:20px;pointer-events:none;
+  border:2px dashed color-mix(in srgb, var(--brand) 60%, #fff);
+}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.drop-card{
+  border:2px dashed #fff;border-radius:20px;padding:34px 52px;text-align:center;color:#fff;
+  background:rgba(20,28,45,.42);font-size:15px;font-weight:600;
+  animation:dropCardIn .26s cubic-bezier(.22,1.1,.4,1);
+}
+@keyframes dropCardIn{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:none}}
+.drop-card small{display:block;font-weight:400;opacity:.8;margin-top:6px;font-size:12.5px}
+
+/* 输入区 */
+.composer-wrap{flex:none;padding:12px 16px 14px;border-top:1px solid var(--line-2);background:var(--panel)}
+.composer{
+  display:flex;align-items:flex-end;gap:8px;background:var(--panel-2);
+  border:1px solid var(--bubble-line);border-radius:16px;padding:8px;transition:.16s;
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  box-shadow:0 6px 18px -16px rgba(46,64,110,.6);
+  max-width:768px;margin:0 auto;
+}
+.composer.focus{border-color:var(--brand);box-shadow:0 0 0 3px color-mix(in srgb, var(--brand) 12%, transparent)}
+.composer textarea{
+  flex:1;min-width:0;resize:none;border:0;outline:none;background:none;color:var(--text);
+  font-family:inherit;font-size:14px;line-height:1.6;padding:6px 6px 6px 8px;
+  max-height:150px;min-height:24px;
+}
+.composer textarea::placeholder{color:var(--text-3)}
+/* 三个按钮横排：竖排时 3×32+间距会把输入框撑到 124px 高，白白吃掉聊天区 */
+.c-btns{display:flex;flex-direction:row;align-items:flex-end;gap:6px;flex:none}
+.c-btn{
+  width:32px;height:32px;border-radius:9px;display:grid;place-items:center;
+  color:var(--text-3);transition:.16s;
+}
+.c-btn:hover{background:var(--panel);color:var(--brand)}
+/* 带文字的按钮：图标 + 两三个字，一眼知道点哪个（纯图标分不清文件夹和附件） */
+.c-btn.labeled{width:auto;padding:0 9px;display:inline-flex;align-items:center;gap:5px;font-size:12px;white-space:nowrap}
+.c-btn.labeled:hover{transform:translateY(-1px)}
+.c-btn.send{
+  background:var(--brand);color:#fff;box-shadow:0 5px 14px -6px rgba(58,111,240,.95);
+}
+.c-btn.send:hover{background:var(--brand-2);color:#fff;transform:translateY(-1px)}
+.c-btn.send:disabled{opacity:.45;box-shadow:none;cursor:not-allowed;transform:none}
+.tip{font-size:11px;color:var(--text-3);margin:7px 3px 0;display:flex;gap:10px;max-width:768px;margin-left:auto;margin-right:auto}
+.tip .kbd{
+  border:1px solid var(--line);border-radius:4px;padding:0 4px;font-size:10px;
+  background:var(--panel);color:var(--text-3);
+}
+/* 这行提示讲的是 Enter / Shift+Enter / 拖拽——全是键盘操作，手机上一条都用不上。
+   App 内（.jc-app）和手机窄屏一律收掉，省出一行高度给消息区。 */
+.jc-app .tip{display:none!important}
+@media (max-width:640px){
+  .tip{display:none}
+  /* 手机屏窄：按钮内边距和字号收一收，否则输入框被挤得放不下一个字 */
+  .c-btn.labeled{padding:0 8px;gap:4px;font-size:11.5px}
+  .c-btns{gap:5px}
+}
+
+/* 上传中 */
+.msg.pending .bubble.file{opacity:.92}
+.progress{height:3px;border-radius:3px;background:var(--panel-2);overflow:hidden;margin-top:8px}
+.progress i{display:block;height:100%;width:0;background:var(--brand);transition:width .18s}
+
+/* ---------------- 右栏 ---------------- */
+.side{display:flex;flex-direction:column;gap:12px;overflow-y:auto;padding-right:2px}
+.side::-webkit-scrollbar{width:6px}
+.side::-webkit-scrollbar-thumb{background:color-mix(in srgb,var(--text-3) 30%,transparent);border-radius:6px}
+.card{background:var(--panel);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px;border:1px solid var(--line);backdrop-filter:blur(14px) saturate(150%);-webkit-backdrop-filter:blur(14px) saturate(150%)}
+.card-title{font-size:12.5px;color:var(--text-2);font-weight:600;margin-bottom:9px}
+.addr-row{display:flex;align-items:center;gap:6px}
+.addr-row a{
+  flex:1;min-width:0;font-size:13px;font-weight:600;color:var(--brand);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.mini{
+  width:26px;height:26px;border-radius:7px;display:grid;place-items:center;
+  color:var(--text-3);background:var(--panel-2);transition:.16s;flex:none;
+}
+.mini:hover{background:var(--brand-soft);color:var(--brand)}
+.online-line{
+  margin-top:12px;padding-top:11px;border-top:1px solid var(--line-2);
+  font-size:11.5px;color:var(--text-3);display:flex;align-items:center;gap:6px;
+}
+.alt-addrs{display:flex;flex-direction:column;gap:2px;margin-top:6px}
+.apk-card{border:1px solid var(--line-2)}
+.apk-row{display:flex;align-items:center;gap:8px}
+.apk-row a{
+  flex:1;min-width:0;font-size:13px;font-weight:600;color:var(--brand);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-decoration:none;
+}
+.apk-row a:hover{text-decoration:underline}
+.apk-tip{font-size:11px;color:var(--text-3);margin-top:7px;line-height:1.5}
+.apk-url{
+  font-size:11px;color:var(--text-2);margin-top:5px;
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+  word-break:break-all;line-height:1.45;
+}
+.apk-qr{
+  margin-top:10px;display:none;background:#fff;border-radius:10px;padding:7px;
+  width:100%;max-width:200px;
+}
+.apk-qr.on{display:block}
+.apk-qr img{width:100%;height:auto;display:block}
+/* 二维码生成失败时的兜底，避免出现一个裂图图标 */
+.qr-fail{
+  font-size:11px;color:#5b6b7a;line-height:1.6;padding:10px 8px;text-align:center;
+}
+/* 剪贴板：一行状态，点开才看历史 */
+.clip-card{margin-top:18px;border:1px solid var(--line-2);border-radius:14px;background:var(--panel-2);overflow:hidden;transition:border-color .2s,background .2s}
+.clip-one{
+  width:100%;display:flex;align-items:center;gap:7px;padding:10px 11px;
+  background:none;border:0;cursor:pointer;font-family:inherit;text-align:left;transition:background .16s;
+}
+.clip-one:hover{background:var(--panel)}
+.clip-dot{width:6px;height:6px;border-radius:50%;background:var(--ok);flex:none;animation:modePulse 2.4s ease-in-out infinite}
+.clip-dot.off{background:var(--text-3);animation:none}
+.clip-txt{flex:1;min-width:0;font-size:11.5px;color:var(--text-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.clip-chan{font-size:9.5px;color:var(--brand);background:var(--brand-soft);padding:1px 6px;border-radius:7px;flex:none;white-space:nowrap}
+.clip-chan.ble{color:var(--ok);background:rgba(61,220,151,.15)}
+.clip-chan.off{color:var(--text-3);background:var(--panel)}
+.clip-caret{color:var(--text-3);flex:none;transition:transform .26s cubic-bezier(.3,1.2,.5,1)}
+.clip-card.open .clip-caret{transform:rotate(180deg)}
+.clip-hist{max-height:0;overflow:hidden;padding:0 11px;transition:max-height .3s cubic-bezier(.3,1,.4,1),padding .3s}
+.clip-card.open .clip-hist{max-height:150px;overflow-y:auto;padding:0 11px 9px}
+.clip-item{font-size:10.5px;color:var(--text-3);padding:5px 0;border-top:1px solid var(--line-2);line-height:1.5;word-break:break-all}
+.clip-item .d{color:var(--text-2)}
+
+/* 扫码连接 / 安卓版 App：左栏常驻，二维码由本机 /api/qr 生成，断网可用 */
+.qcards{margin-top:12px;display:flex;flex-direction:column;gap:10px}
+.qcard{
+  display:flex;align-items:center;gap:10px;padding:9px;
+  border:1px solid var(--line-2);border-radius:14px;background:var(--panel-2);
+  cursor:pointer;transition:border-color .2s,background .2s,transform .18s;
+}
+.qcard:hover{border-color:var(--brand-mid);background:var(--panel);transform:translateY(-1px)}
+.qimg{
+  width:72px;height:72px;flex:none;border-radius:10px;overflow:hidden;background:#fff;
+  padding:3px;box-sizing:border-box;transition:transform .26s cubic-bezier(.3,1.2,.5,1);
+}
+.qcard:hover .qimg{transform:scale(1.03)}
+.qimg img{width:100%;height:100%;display:block;object-fit:contain}
+.qinfo{min-width:0;flex:1}
+.qtitle{font-size:11.5px;font-weight:600;color:var(--text)}
+/* 地址本身是按钮：点一下就复制，不用整卡点（整卡点留给"放大二维码"） */
+.qaddr{
+  display:block;width:100%;text-align:left;
+  font:inherit;font-size:10.5px;color:var(--brand);margin-top:2px;padding:0;
+  background:none;border:0;cursor:pointer;
+  font-variant-numeric:tabular-nums;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  transition:color .16s;
+}
+.qaddr:hover{text-decoration:underline;color:var(--brand-2)}
+.qsub{font-size:9.5px;color:var(--text-3);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* 安卓版：左栏只放一行文字入口，二维码在弹窗里给。
+   两个 66px 的码上下贴太近时，手机取景框会同时框住两个、只认出其中一个。 */
+.apk-line{
+  display:flex;align-items:center;gap:7px;width:100%;height:34px;padding:0 11px;
+  border:1px dashed var(--line-2);border-radius:11px;background:transparent;
+  color:var(--text-2);font-family:inherit;font-size:11.5px;cursor:pointer;
+  transition:border-color .18s,color .18s,background .18s;
+}
+.apk-line:hover{border-color:var(--brand-mid);color:var(--brand);background:var(--panel-2)}
+.apk-line-txt{flex:1;text-align:left;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.apk-line b{font-weight:600;color:var(--text-3);font-variant-numeric:tabular-nums;transition:color .18s}
+.apk-line:hover b{color:var(--brand)}
+.apk-caret{flex:none;opacity:.55;transition:transform .18s,opacity .18s}
+.apk-line:hover .apk-caret{opacity:1;transform:translateX(2px)}
+
+/* 在线设备：收成一粒灰字，点开才展开列表 */
+.online-mini-wrap{position:relative;margin-bottom:8px}
+.online-mini{
+  display:flex;align-items:center;gap:5px;padding:3px 0;background:none;border:0;
+  cursor:pointer;font-family:inherit;font-size:10.5px;color:var(--text-3);transition:color .16s;
+}
+.online-mini:hover{color:var(--text-2)}
+.online-mini .d{width:5px;height:5px;border-radius:50%;background:var(--ok);flex:none}
+.online-mini .caret{transition:transform .22s cubic-bezier(.3,1.2,.5,1)}
+.online-mini-wrap.open .caret{transform:rotate(180deg)}
+.online-pop{
+  position:absolute;left:0;bottom:calc(100% + 6px);width:100%;z-index:40;
+  background:var(--panel);border:1px solid var(--line-2);border-radius:12px;padding:10px 11px;
+  box-shadow:var(--shadow);opacity:0;visibility:hidden;
+  transform:translateY(4px) scale(.97);transform-origin:bottom left;
+  transition:opacity .18s,transform .18s,visibility .18s;
+}
+.online-mini-wrap.open .online-pop{opacity:1;visibility:visible;transform:none}
+.online-pop-head{font-size:10px;color:var(--text-3);margin-bottom:4px}
+/* 手机端原生上传进度条（App 通过 JC_UPLOAD_HOOK 推进度） */
+#nativeProg{
+  display:none;position:fixed;left:50%;transform:translateX(-50%);bottom:18px;z-index:99;
+  width:min(420px,88vw);background:var(--panel);border:1px solid var(--line-2);
+  border-radius:14px;padding:11px 16px;backdrop-filter:blur(16px);
+}
+#nativeProg b{display:block;font-size:12px;color:var(--text);margin-bottom:7px;font-weight:500;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#nativeProg .track{height:5px;border-radius:3px;background:rgba(255,255,255,.1);overflow:hidden}
+#nativeProg .track i{display:block;height:100%;width:0;background:var(--brand);border-radius:3px;transition:width .2s}
+#nativeProg.bad .track i{background:#e06666}
+#nativeProg.bad b{color:#e06666}
+.alt-line{
+  font-size:11px;color:var(--text-3);font-variant-numeric:tabular-nums;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.alt-line:hover{color:var(--text-2)}
+.online-line b{color:var(--ok)}
+.online-list{display:flex;flex-direction:column;gap:7px;margin-top:9px}
+.online-item{display:flex;align-items:center;gap:8px;font-size:11.5px;color:var(--text-2)}
+.online-item .d{width:6px;height:6px;border-radius:50%;background:var(--ok);flex:none}
+.online-item .ip{margin-left:auto;color:var(--text-3);font-variant-numeric:tabular-nums}
+
+.fold{background:var(--panel);border-radius:16px;box-shadow:var(--shadow-sm);overflow:hidden;border:1px solid var(--line-2);backdrop-filter:blur(14px) saturate(150%);-webkit-backdrop-filter:blur(14px) saturate(150%)}
+.fold summary{
+  list-style:none;cursor:pointer;padding:13px 15px;font-size:12.5px;font-weight:600;
+  color:var(--text-2);display:flex;align-items:center;justify-content:space-between;
+  user-select:none;transition:.16s;
+}
+.fold summary::-webkit-details-marker{display:none}
+.fold summary:hover{color:var(--text)}
+.fold summary::after{
+  content:"";width:7px;height:7px;border-right:1.6px solid currentColor;border-bottom:1.6px solid currentColor;
+  transform:rotate(45deg) translateY(-2px);opacity:.55;transition:.22s;
+}
+.fold[open] summary::after{transform:rotate(-135deg) translateY(-2px)}
+.fold .body{
+  padding:0 15px 14px;font-size:12px;color:var(--text-2);line-height:1.85;
+  border-top:1px solid var(--line-2);margin-top:0;padding-top:11px;
+}
+.fold .body ol{margin:0;padding-left:16px}
+.fold .body li{margin-bottom:5px}
+.fold .body li:last-child{margin-bottom:0}
+
+/* 弹窗 */
+.modal{
+  position:fixed;inset:0;z-index:80;display:none;place-items:center;
+  background:rgba(10,14,22,.55);backdrop-filter:blur(4px);padding:20px;
+}
+.modal.on{display:grid}
+.modal-card{
+  background:var(--panel);border-radius:20px;padding:22px;max-width:340px;width:100%;
+  box-shadow:0 30px 70px -30px rgba(0,0,0,.6);text-align:center;position:relative;
+  animation:pop .24s cubic-bezier(.2,.8,.3,1);
+}
+@keyframes pop{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:none}}
+.modal-card h3{margin:0 0 4px;font-size:15px}
+.modal-card .sub{font-size:12px;color:var(--text-3);margin-bottom:16px}
+.qr-box{
+  width:216px;height:216px;margin:0 auto;border-radius:14px;background:#fff;
+  display:grid;place-items:center;overflow:hidden;padding:8px;
+}
+.qr-box img{width:100%;height:100%;object-fit:contain}
+.qr-box .fallback{font-size:12px;color:#666;padding:16px;line-height:1.8}
+.modal-card .url-line{
+  margin-top:14px;font-size:12.5px;color:var(--text-2);word-break:break-all;
+  background:var(--panel-2);border-radius:9px;padding:8px 10px;
+}
+.modal-close{
+  position:absolute;top:12px;right:12px;width:28px;height:28px;border-radius:8px;
+  display:grid;place-items:center;color:var(--text-3);
+}
+.modal-close:hover{background:var(--panel-2);color:var(--text)}
+.lightbox{
+  position:fixed;inset:0;z-index:90;display:none;place-items:center;
+  background:rgba(6,9,15,.9);padding:28px;
+}.lightbox.on{display:grid}
+.lightbox img{max-width:100%;max-height:100%;border-radius:10px;box-shadow:0 30px 80px rgba(0,0,0,.7)}
+#copyArea{
+  width:100%;height:130px;resize:none;border-radius:12px;
+  border:1px solid var(--line);background:var(--panel-2);color:var(--text);
+  font-family:inherit;font-size:13px;line-height:1.65;padding:11px 12px;outline:none;
+  text-align:left;
+}
+#copyArea:focus{border-color:var(--brand)}
+
+/* 音视频播放器 */
+.modal.media{background:rgba(3,7,12,.88);backdrop-filter:blur(10px)}
+.media-card{
+  position:relative;width:100%;max-width:min(880px,94vw);
+  background:rgba(12,22,32,.78);border:1px solid rgba(170,208,232,.18);
+  border-radius:20px;padding:14px;
+  box-shadow:0 40px 100px -40px rgba(0,0,0,.95), inset 0 1px 0 rgba(255,255,255,.1);
+  backdrop-filter:blur(18px);
+}
+#mediaVideo{width:100%;max-height:74vh;border-radius:12px;background:#000;display:none}
+#mediaAudio{width:100%;display:none;margin:8px 0 2px}
+.media-cover{display:none;place-items:center;padding:30px 0 10px}
+.cover-disc{
+  width:124px;height:124px;border-radius:50%;display:grid;place-items:center;color:#bfe0f7;
+  background:radial-gradient(circle at 32% 28%,#4285b8,#12324a 72%);
+  box-shadow:0 20px 44px -20px rgba(0,0,0,.95), inset 0 2px 0 rgba(255,255,255,.28);
+  animation:spin 9s linear infinite;animation-play-state:paused;
+}
+.cover-disc svg{width:46px;height:46px}
+.media-cover.spin .cover-disc{animation-play-state:running}
+@keyframes spin{to{transform:rotate(360deg)}}
+.media-title{
+  font-size:12.5px;color:var(--text-2);margin-top:11px;text-align:center;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.media-card .modal-close{color:#cfe0ee}
+.media-card .modal-close:hover{background:rgba(255,255,255,.12)}
+/* 播放层左上角「地址」：只在音视频时出现，点了复制可给投影仪 VLC 用的地址 */
+.media-pill{
+  position:absolute;top:12px;left:12px;height:28px;padding:0 11px;border-radius:9px;
+  display:none;align-items:center;gap:6px;
+  font-size:12px;color:#cfe0ee;
+  background:rgba(10,22,34,.55);border:1px solid rgba(170,208,232,.22);
+  backdrop-filter:blur(8px);
+  transition:background .18s, color .18s, transform .18s;
+}
+.media-pill.on{display:inline-flex}
+.media-pill:hover{background:rgba(47,127,184,.32);color:#fff}
+.media-pill:active{transform:scale(.96)}
+.media-pill svg{width:13px;height:13px}
+
+/* toast */
+.toast{
+  position:fixed;left:50%;bottom:34px;transform:translate(-50%,14px);z-index:120;
+  background:rgba(22,28,42,.94);color:#fff;font-size:12.5px;padding:9px 16px;border-radius:11px;
+  opacity:0;pointer-events:none;transition:.24s;backdrop-filter:blur(6px);
+}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+
+/* ---------------- 自绘顶栏（备用方案，当前不启用） ----------------
+   独立窗口里页面会带 html.win-app（URL 的 ?app=1 打的标记）；
+   只有再额外带 wbar-on 才画这条顶栏。现在走系统标题栏，所以是关着的，
+   哪天想回无边框方案，让 run_window 的 URL 带上 &wbar=1 即可。 */
+.wbar{display:none}
+.win-app.wbar-on .wbar{
+  position:fixed;top:0;left:0;right:0;height:34px;z-index:300;
+  display:flex;align-items:center;gap:0;padding-left:13px;
+  background:transparent;
+}
+.wbar-logo{
+  width:19px;height:19px;flex:none;display:grid;place-items:center;
+  color:var(--brand);filter:drop-shadow(0 2px 6px var(--glow));
+}
+.wbar-drag{flex:1 1 auto;align-self:stretch;cursor:default}
+.wbar-btns{display:flex;height:100%;flex:none}
+.wbar-btn{
+  width:46px;height:100%;display:grid;place-items:center;
+  color:var(--text-2);transition:background .13s,color .13s;
+}
+.wbar-btn:hover{background:color-mix(in srgb,var(--text) 10%,transparent);color:var(--text)}
+.wbar-btn.close:hover{background:#e81123;color:#fff}
+.wbar-btn svg{width:10.5px;height:10.5px}
+.win-app.wbar-on .app{height:calc(100vh - 34px);margin-top:34px}
+/* 登录遮罩让开顶栏那一条，输入密码时也能直接点右上角关窗 */
+.win-app.wbar-on .login-mask{top:34px}
+
+/* ================= 动效 =================
+   只用 transform / opacity，绝不改宽高 —— 改宽高会触发重排，图片列表会卡。
+   系统开了「减弱动态效果」时整块失效（见文件末尾的 prefers-reduced-motion）。 */
+
+/* 收到文件：卡片弹一下 */
+@keyframes popIn{
+  0%{transform:scale(1)}
+  42%{transform:scale(1.045)}
+  62%{transform:scale(.988)}
+  82%{transform:scale(1.006)}
+  100%{transform:scale(1)}
+}
+.msg.fresh .bubble{animation:popIn .62s cubic-bezier(.3,1.3,.5,1)}
+
+/* 收到文件：缩略图外扩一圈光环，让"落地"这件事有分量 */
+@keyframes ringOut{
+  from{opacity:.7;transform:scale(.62)}
+  to{opacity:0;transform:scale(1.95)}
+}
+.msg.fresh .thumb{position:relative}
+.msg.fresh .thumb::after{
+  content:'';position:absolute;inset:0;border-radius:11px;
+  border:2px solid var(--ok);animation:ringOut .52s ease-out;
+}
+
+/* 进度条流光：高速扫过的一道白，表示"还在动"，不是卡死了 */
+.progress{position:relative}
+.progress i{position:relative;overflow:hidden}
+.progress i::after{
+  content:'';position:absolute;top:0;bottom:0;left:0;width:34px;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.8),transparent);
+  animation:sheen 1.5s linear infinite;
+}
+@keyframes sheen{from{transform:translateX(-38px)}to{transform:translateX(340px)}}
+
+/* 文件卡悬停：抬起 2px */
+.bubble.file{transition:transform .16s ease,box-shadow .16s ease,border-color .16s ease}
+.bubble.file:hover{transform:translateY(-2px);box-shadow:0 14px 28px -22px var(--glow)}
+
+/* 面板（弹窗/设置）从自己的位置展开，不是从屏幕中间长出来 */
+.modal.on .modal-card{animation:panelIn .2s cubic-bezier(.2,.9,.3,1)}
+@keyframes panelIn{from{opacity:0;transform:translateY(8px) scale(.968)}to{opacity:1;transform:none}}
+
+/* 切主题：所有颜色一起过渡 280ms，别啪一下变色 */
+html.theme-fade *,
+html.theme-fade *::before,
+html.theme-fade *::after{
+  transition:background-color .28s ease,border-color .28s ease,color .28s ease,
+             fill .28s ease,stroke .28s ease !important;
+}
+
+/* 空状态插画轻轻浮动，页面不是死的 */
+@keyframes idleFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+.empty .ring{animation:idleFloat 4s ease-in-out infinite}
+
+/* 上传中：百分比 + 速度。数字用等宽字形，滚动时不抖 */
+.finfo .pmeta{font-size:11px;color:var(--text-3);margin-top:4px;font-variant-numeric:tabular-nums}
+.finfo .pmeta.ok{color:var(--ok);font-weight:600}
+.progress.done i{background:var(--ok)}
+
+/* 百分比数字由 JS 逐帧缓动，肉眼能看见它在"爬"，不是一百一百地跳 */
+.finfo .pmeta b{display:inline-block;min-width:32px;font-weight:600;color:var(--text-2);
+  transform-origin:left center}
+.finfo .pmeta.ok b{color:var(--ok)}
+@keyframes numPop{0%{transform:scale(1)}38%{transform:scale(1.2)}100%{transform:scale(1)}}
+.finfo .pmeta b.pop{animation:numPop .44s cubic-bezier(.3,1.4,.5,1)}
+
+/* 取消上传：进度条右边一个低调的文字按钮。
+   不用 ✕ 图标——12sp 的小卡片里图标认不出来，文字最直接。 */
+.prow{display:flex;align-items:center;gap:9px}
+.prow .progress{flex:1;min-width:0}
+.pcancel{
+  flex:none;font-size:11px;line-height:1;color:var(--text-3);
+  padding:5px 7px;border-radius:7px;background:transparent;
+  transition:color .15s,background .15s;
+}
+.pcancel:hover{color:#e2585a;background:var(--brand-soft)}
+.pcancel:active{transform:scale(.94)}
+/* 已取消：整条进度转灰、条子停住，停留 1 秒让人看清"是我取消的" */
+.msg.pending.cancelled .pmeta{color:var(--text-3);font-weight:400}
+.msg.pending.cancelled .progress i{background:var(--text-3);opacity:.5}
+.msg.pending.cancelled .bubble{opacity:.72}
+@keyframes cancelShake{0%,100%{transform:translateX(0)}30%{transform:translateX(-2px)}70%{transform:translateX(2px)}}
+.msg.pending.cancelled .bubble{animation:cancelShake .3s ease-out}
+
+/* 收到文件：从卡片右上角飘出「+12.3 MB」，像"落袋"一样有个交代 */
+@keyframes gainFloat{
+  0%{opacity:0;transform:translateY(10px) scale(.86)}
+  22%{opacity:1;transform:translateY(-2px) scale(1.04)}
+  62%{opacity:1;transform:translateY(-8px) scale(1)}
+  100%{opacity:0;transform:translateY(-22px) scale(1)}
+}
+.bubble.file{position:relative}
+.msg.fresh .bubble.file[data-gain]::after{
+  content:attr(data-gain);position:absolute;top:-9px;right:10px;z-index:3;
+  font-size:11px;font-weight:600;line-height:1;padding:4px 8px;border-radius:999px;
+  color:var(--ok);background:var(--panel);border:1px solid var(--ok);
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  pointer-events:none;animation:gainFloat 1.6s ease-out forwards;
+}
+
+/* 在线设备数量变化：数字从上面滚进来 */
+@keyframes numTick{
+  0%{opacity:0;transform:translateY(-72%)}
+  62%{opacity:1;transform:translateY(8%)}
+  100%{opacity:1;transform:translateY(0)}
+}
+#onlineMiniText b{display:inline-block;font-weight:600}
+#onlineMiniText b.tick{animation:numTick .36s cubic-bezier(.3,1.3,.5,1)}
+.progress.done i::after{display:none}
+/* 传完停一下再收起，让「已完成」看得见 */
+@keyframes cardOut{to{opacity:0;transform:translateY(-4px)}}
+.msg.pending.done{animation:cardOut .34s ease 1.05s forwards}
+
+@media (max-width:1240px){
+  .app{grid-template-columns:224px minmax(0,1fr)}
+}
+@media (max-width:1040px){
+  .app{grid-template-columns:208px minmax(0,1fr)}
+  /* 208px 栏里卡片内容区只剩 ~138px：标题 4 字(52) + 胶囊(40) + 开关(40) + 间距 28
+     就顶到 160，标题会被压成「公…」。这一档收起胶囊，状态交给开关轨道色
+     （灰=关、品牌色=开）和副标题第一句。224px 档不会命中这条，胶囊照常显示。 */
+  .mode-badge{display:none}
+}
+@media (max-width:940px){
+  .app{grid-template-columns:minmax(0,1fr)}
+  .rail{display:none}
+}
+@media (max-width:820px){
+  .app{grid-template-columns:minmax(0,1fr);padding:0;gap:0}
+  .rail{display:none}
+  .panel{border-radius:0}
+  .stream-inner{padding:16px 14px 8px}
+  .bubble.file{min-width:0;max-width:100%}
+  .bubble{max-width:88%}
+  .thumb{width:64px;height:64px}
+}
+/* 系统开了「减弱动态效果」：整套动效关掉，只留静态结果 */
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{
+    animation-duration:.001ms !important;
+    animation-iteration-count:1 !important;
+    transition-duration:.001ms !important;
+    scroll-behavior:auto !important;
+  }
+}
+</style>
+</head>
+<body>
+
+<!-- 独立窗口顶栏：只有图标 + 右侧三键，中间透明融进主题背景 -->
+<div class="wbar pywebview-drag-region">
+  <div class="wbar-logo">
+    <svg width="19" height="19" viewBox="0 0 24 24" fill="currentColor"><path d="M3.4 12.3 20.6 4l-4.9 15.6-4.3-6.1-8 .9 3.6-3.4-.7-3.7z" opacity=".95"/></svg>
+  </div>
+  <div class="wbar-drag"></div>
+  <div class="wbar-btns">
+    <button class="wbar-btn" id="wMin" title="最小化">
+      <svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1"><path d="M1 5h8"/></svg>
+    </button>
+    <button class="wbar-btn" id="wMax" title="最大化">
+      <svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1" id="wMaxIcon"><rect x="1.2" y="1.2" width="7.6" height="7.6" rx="1"/></svg>
+    </button>
+    <button class="wbar-btn close" id="wClose" title="关闭">
+      <svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.1"><path d="M1.4 1.4l7.2 7.2M8.6 1.4L1.4 8.6"/></svg>
+    </button>
+  </div>
+</div>
+
+<!-- 登录遮罩 -->
+<div class="login-mask" id="loginMask">
+  <div class="login-card">
+    <div class="login-logo">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><path d="M3.4 12.3 20.6 4l-4.9 15.6-4.3-6.1-8 .9 3.6-3.4-.7-3.7z" opacity=".95"/></svg>
+    </div>
+    <h3>简传 Lite</h3>
+    <div class="login-sub">需要访问密码才能继续</div>
+    <input type="password" id="loginPwd" placeholder="访问密码" autocomplete="current-password">
+    <button id="loginBtn">进 入</button>
+    <div class="login-err" id="loginErr"></div>
+  </div>
+</div>
+
+<div class="app">
+  <!-- ================= 左栏 ================= -->
+  <aside class="panel rail">
+    <div class="brand">
+      <div class="logo">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M3.4 12.3 20.6 4l-4.9 15.6-4.3-6.1-8 .9 3.6-3.4-.7-3.7z" opacity=".95"/></svg>
+      </div>
+      <div>
+        <div class="brand-name">简传 Lite</div>
+        <div class="brand-sub">简洁使用，传送方便</div>
+      </div>
+    </div>
+
+    <nav class="rail-nav">
+      <button class="nav-item active">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        公共频道
+        <span class="badge" id="msgCount">0</span>
+      </button>
+      <button class="nav-item" id="pickNav">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5-5 5 5"/><path d="M12 15V5"/></svg>
+        发送文件
+      </button>
+      <button class="nav-item" id="clearNav">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14H6L5 6"/></svg>
+        清空记录
+      </button>
+    </nav>
+
+    <!-- 剪贴板：默认自动同步，不再有开关。只显示一行状态，点一下展开最近几条 -->
+    <div class="clip-card" id="clipCard">
+      <button class="clip-one" id="clipHead" title="点击查看最近同步的内容">
+        <span class="clip-dot" id="clipDot"></span>
+        <span class="clip-txt" id="clipLine">剪贴板自动同步中</span>
+        <span class="clip-chan" id="clipBadge">局域网</span>
+        <svg class="clip-caret" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+      </button>
+      <div class="clip-hist" id="clipHist"></div>
+    </div>
+
+    <!-- 左栏只留**一个**二维码。以前两个码上下只隔 10px，手机取景框会把两个
+         一起框住、只认出其中一个；两个码的网址前缀又一样，扫错 APK 码就直接
+         开始下载文件，用户以为"连上了"。所以安卓版改成一行文字入口，点开弹窗
+         才给大码。QR 由本机 /api/qr 生成，断网也能扫。 -->
+    <div class="qcards">
+      <div class="qcard" id="scanCard" title="点击放大二维码">
+        <div class="qimg"><img id="scanQr" alt="扫码连接"></div>
+        <div class="qinfo">
+          <div class="qtitle">扫码连接</div>
+          <button class="qaddr" id="scanAddr" title="点击复制地址">正在获取…</button>
+          <div class="qsub">同一 WiFi 扫码即连</div>
+        </div>
+      </div>
+      <button class="apk-line" id="apkLine" title="查看下载二维码">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v10"/><path d="M8 11l4 4 4-4"/><path d="M5 19h14"/></svg>
+        <span class="apk-line-txt">安装安卓版 <b id="apkVer">—</b></span>
+        <svg class="apk-caret" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+      </button>
+    </div>
+
+    <div class="rail-foot">
+      <!-- 连接模式开关（只在本机/局域网显示） -->
+      <div class="mode-card" id="modeCard" style="display:none">
+        <div class="mode-row">
+          <div class="mode-label">
+            <div class="mode-title"><span class="mode-dot"></span><span id="modeTitle" title="打开后外面的人也能连（需要密码）">公网访问</span><span class="mode-badge" id="modeBadge">已关闭</span></div>
+            <div class="mode-sub" id="modeSub">打开后外网也能连</div>
+          </div>
+          <label class="switch" title="切换公网访问">
+            <input type="checkbox" id="tunnelSwitch">
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div class="mode-url" id="modeUrl">
+          <div class="mu-line">
+            <span class="pub-url" id="pubUrl">正在建立隧道…</span>
+            <button class="mini" id="pubCopy" title="复制公网地址">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2.4"/><path d="M5 15V5a2 2 0 0 1 2-2h8"/></svg>
+            </button>
+          </div>
+        </div>
+        <!-- 密码行不受公网开关影响，一直露着：
+             以前它只打在黑框控制台上，exe 隐藏控制台后就没地方看了 -->
+        <div class="mu-line mode-pwd">
+          <span class="pwd-k">公网密码</span>
+          <span class="pwd-v" id="pwdVal" title="公网访客需要输入这个">—</span>
+          <button class="mini" id="pwdCopy" title="复制访问密码">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2.4"/><path d="M5 15V5a2 2 0 0 1 2-2h8"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="rail-actions">
+        <button class="round" id="themeBtn" title="切换主题">
+          <svg id="themeIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+        </button>
+        <button class="round" id="settingsBtn" title="设置">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1 1.55V21a2 2 0 1 1-4 0v-.09a1.7 1.7 0 0 0-1-1.55 1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.7 1.7 0 0 0 .34-1.87 1.7 1.7 0 0 0-1.55-1H3a2 2 0 1 1 0-4h.09a1.7 1.7 0 0 0 1.55-1 1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.7 1.7 0 0 0 1.87.34h.09a1.7 1.7 0 0 0 1-1.55V3a2 2 0 1 1 4 0v.09a1.7 1.7 0 0 0 1 1.55 1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.7 1.7 0 0 0-.34 1.87v.09a1.7 1.7 0 0 0 1.55 1H21a2 2 0 1 1 0 4h-.09a1.7 1.7 0 0 0-1.55 1z"/></svg>
+        </button>
+        <button class="round" id="qrBtn" title="显示二维码">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3v3h-3z"/><path d="M21 14v3M18 21h3"/></svg>
+        </button>
+        <button class="round" id="infoBtn" title="关于">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v6"/><path d="M12 7.5v.01"/></svg>
+        </button>
+      </div>
+      <!-- 在线设备：右栏整块删掉后收成一粒灰字，需要时才展开 -->
+      <div class="online-mini-wrap">
+        <button class="online-mini" id="onlineMini" title="查看在线设备">
+          <span class="d"></span>
+          <span id="onlineMiniText">1 台在线</span>
+          <svg class="caret" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+        </button>
+        <div class="online-pop" id="onlinePop">
+          <div class="online-pop-head">在线设备</div>
+          <div class="online-list" id="onlineList"></div>
+        </div>
+      </div>
+
+      <div class="rail-meta">
+        <div>版本 <b id="verText">1.0.0</b>（持续更新中）</div>
+        <div id="netHint">局域网内 · 无需联网</div>
+        <div class="split"></div>
+        <div style="font-size:11px">Copyright © 2026 简传 Lite</div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ================= 中栏 ================= -->
+  <section class="panel chat">
+    <header class="chat-head">
+      <div class="chan" id="chanRow">
+        <span class="dot" id="chanDot"></span>
+        当前频道：<b id="chanName">连接中</b>
+      </div>
+      <div class="head-right">
+        <div class="search-wrap" id="searchWrap">
+          <input id="searchInput" type="text" placeholder="搜索消息…">
+        </div>
+        <button class="icon-btn" id="searchBtn" title="搜索">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.6-3.6"/></svg>
+        </button>
+        <button class="icon-btn" id="refreshBtn" title="刷新">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8 8 0 1 0-2.6 6"/><path d="M20 5v6h-6"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <div class="stream" id="stream">
+      <div class="stream-inner" id="streamInner">
+        <div class="empty" id="empty">
+          <div class="ring">
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4"/><path d="M7 9l5-5 5 5"/><path d="M4 15v3a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3v-3"/></svg>
+          </div>
+          <h3>把文件拖进来，或直接粘贴文字</h3>
+          <p>同一 WiFi 下的手机、平板、电脑都能看见<br>互传文件不走外网，快而且不占流量</p>
+        </div>
+        <div id="pendingBox"></div>
+      </div>
+    </div>
+
+    <div class="composer-wrap">
+      <div class="composer" id="composer">
+        <textarea id="input" rows="1" placeholder="请输入内容，Enter 键可快捷发送，Shift + Enter 换行"></textarea>
+        <div class="c-btns">
+          <button class="c-btn labeled" id="folderBtn" title="发送文件夹（打包成 zip）">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+            <span>传文件夹</span>
+          </button>
+          <button class="c-btn labeled" id="pickBtn" title="发送文件">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/></svg>
+            <span>传文件</span>
+          </button>
+          <button class="c-btn send" id="sendBtn" title="发送">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M3.4 20.4 21.2 12 3.4 3.6l1.9 7.2 9.1 1.2-9.1 1.2-1.9 7.2z"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="tip">
+        <span><span class="kbd">Enter</span> 发送</span>
+        <span><span class="kbd">Shift</span>+<span class="kbd">Enter</span> 换行</span>
+        <span>支持拖拽 / 粘贴文件</span>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<!-- 拖拽遮罩 -->
+<div class="drop-mask" id="dropMask">
+  <div class="drop-card">
+    松开鼠标即可发送
+    <small>支持多文件，最大 4GB</small>
+  </div>
+</div>
+
+<!-- 二维码弹窗 -->
+<div class="modal" id="qrModal">
+  <div class="modal-card">
+    <button class="modal-close" data-close="qrModal">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+    <h3>扫码在手机上打开</h3>
+    <div class="sub">手机连同一个 WiFi 后扫这里</div>
+    <div class="qr-box" id="qrBox"></div>
+    <div class="url-line" id="qrUrl">—</div>
+  </div>
+</div>
+
+<!-- 安卓版下载弹窗：二维码从左上角搬到这里，左栏就不会和连接码挤成一堆 -->
+<div class="modal" id="apkModal">
+  <div class="modal-card">
+    <button class="modal-close" data-close="apkModal">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+    <h3>安装安卓版</h3>
+    <div class="sub" id="apkModalSub">同一 WiFi 扫码下载</div>
+    <div class="qr-box"><img id="apkQrBig" alt="安卓版下载二维码"></div>
+    <div class="url-line" id="apkModalUrl">—</div>
+    <button class="set-save" id="apkDlBtn">直接下载</button>
+    <button class="apk-copy" id="apkCopyBtn">复制下载链接</button>
+  </div>
+</div>
+
+<!-- 关于 -->
+<div class="modal" id="infoModal">
+  <div class="modal-card">
+    <button class="modal-close" data-close="infoModal">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+    <h3>简传 Lite</h3>
+    <div class="sub">局域网文件与文本互传 · 纯本地</div>
+    <div style="font-size:12.5px;color:var(--text-2);line-height:1.9;text-align:left">
+      · 数据全部留在本机 <b style="color:var(--text)">data/</b> 目录<br>
+      · 不依赖任何云服务，断网也能用<br>
+      · 单文件上限 4GB，历史保留 1500 条<br>
+      · 用 Python 标准库写的，零第三方依赖
+    </div>
+  </div>
+</div>
+
+<!-- 设置 -->
+<div class="modal" id="settingsModal">
+  <div class="modal-card" style="max-width:420px">
+    <button class="modal-close" data-close="settingsModal">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+    <h3>设置</h3>
+    <div class="sub">这些只在本机生效，公网访客看不到</div>
+    <div class="set-row">
+      <label for="setPwd">访问密码</label>
+      <input id="setPwd" type="text" placeholder="公网访问时用，建议 8 位以上">
+    </div>
+    <div class="set-row">
+      <label for="setServer">自建公网服务器</label>
+      <input id="setServer" type="text" placeholder="例如 http://123.45.67.89:8787（留空则用免费隧道）">
+      <div class="set-hint">租了服务器填这里，公网地址就固定不变了。服务器端配置见 README。</div>
+    </div>
+    <button class="set-save" id="setSave">保 存</button>
+  </div>
+</div>
+
+<!-- 手动复制兜底 -->
+<div class="modal" id="copyModal">
+  <div class="modal-card" style="max-width:440px">
+    <button class="modal-close" data-close="copyModal">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+    <h3>手动复制</h3>
+    <div class="sub">浏览器不允许自动写入剪贴板<br>按 Ctrl + C，或长按选中后再复制</div>
+    <textarea id="copyArea" readonly></textarea>
+  </div>
+</div>
+
+<!-- 音视频播放 -->
+<div class="modal media" id="mediaModal">
+  <div class="media-card">
+    <button class="modal-close" id="mediaClose">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+    <button class="media-pill" id="mediaCast" title="复制播放地址（投影仪 VLC 里粘贴即可播）">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.5 13.5a4.5 4.5 0 0 0 6.4.4l2.6-2.6a4.5 4.5 0 0 0-6.4-6.4l-1.5 1.5"/><path d="M13.5 10.5a4.5 4.5 0 0 0-6.4-.4l-2.6 2.6a4.5 4.5 0 0 0 6.4 6.4l1.5-1.5"/></svg>
+      <span>地址</span>
+    </button>
+    <video id="mediaVideo" controls playsinline></video>
+    <div class="media-cover" id="mediaCover">
+      <div class="cover-disc">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 17.5V5.2l10-2v12.3"/><circle cx="6.4" cy="17.6" r="2.6"/><circle cx="16.4" cy="15.6" r="2.6"/></svg>
+      </div>
+    </div>
+    <audio id="mediaAudio" controls></audio>
+    <div class="media-title" id="mediaTitle"></div>
+  </div>
+</div>
+
+<!-- 看大图 -->
+<div class="lightbox" id="lightbox"><img id="lightboxImg" alt=""></div>
+<div class="toast" id="toast"></div>
+
+<!-- 手机 App 原生上传进度（JC_UPLOAD_HOOK 推进来的） -->
+<div id="nativeProg"><b>正在发送…</b><div class="track"><i></i></div></div>
+
+<input type="file" id="fileInput" multiple hidden>
+<input type="file" id="folderInput" webkitdirectory hidden>
+
+<script src="/static/jszip.min.js"></script>
+<script>
+(function () {
+  'use strict';
+
+  // ------------------------------------------------------------ 基础
+  var $ = function (id) { return document.getElementById(id); };
+  var stream = $('stream'), inner = $('streamInner'), emptyBox = $('empty');
+  var pendingBox = $('pendingBox'), input = $('input'), fileInput = $('fileInput');
+  var toastEl = $('toast');
+
+  var CID = (function () {
+    var v = null;
+    try { v = localStorage.getItem('jc.cid'); } catch (e) {}
+    if (!v) {
+      v = 'c_' + Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
+      try { localStorage.setItem('jc.cid', v); } catch (e) {}
+    }
+    return v;
+  })();
+
+  var lastId = 0, lastStamp = 0, totalCount = 0, baseUrl = '', lanIps = [];
+  var filterText = '';
+
+  function p2(n) { return n < 10 ? '0' + n : '' + n; }
+
+  function fmtFull(t) {
+    var d = new Date(t * 1000);
+    return d.getFullYear() + '/' + (d.getMonth() + 1) + '/' + d.getDate() + ' ' +
+      p2(d.getHours()) + ':' + p2(d.getMinutes()) + ':' + p2(d.getSeconds());
+  }
+
+  // 文件卡片上显示的传输日期：2026/11/2 20:15
+  function fmtDate(t) {
+    if (!t) return '';
+    var d = new Date(t * 1000);
+    return d.getFullYear() + '/' + (d.getMonth() + 1) + '/' + d.getDate() + ' ' +
+      p2(d.getHours()) + ':' + p2(d.getMinutes());
+  }
+
+  function fmtSize(n) {
+    if (n < 1024) return n + ' B';
+    if (n < 1048576) return (n / 1024).toFixed(2) + ' KB';
+    if (n < 1073741824) return (n / 1048576).toFixed(2) + ' MB';
+    return (n / 1073741824).toFixed(2) + ' GB';
+  }
+
+  function escHtml(s) {
+    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  function toast(msg) {
+    toastEl.textContent = msg;
+    toastEl.classList.add('on');
+    clearTimeout(toast._t);
+    toast._t = setTimeout(function () { toastEl.classList.remove('on'); }, 1900);
+  }
+
+  // ------------------------------------------------------------ 雨窗纹理
+  // 用 SVG 随机画玻璃上的水珠：中心高光、边缘发暗（模拟光线折射），
+  // 再撒一批垂直的细流痕。生成一次当背景图用，滚动时不重绘。
+  function makeRainTexture(w, h) {
+    var i, x, y, r, o, len, rw;
+    var drops = '';
+    var count = Math.round(w * h / 1400);
+    for (i = 0; i < count; i++) {
+      x = Math.random() * w;
+      y = Math.random() * h;
+      var big = Math.random() < 0.075;                       // 一小撮大水珠，撑起画面
+      r = big ? (7 + Math.random() * 8) : (1.3 + Math.pow(Math.random(), 2.2) * 6);
+      o = big ? (0.52 + Math.random() * 0.42) : (0.22 + Math.random() * 0.55);
+      drops += '<circle cx="' + x.toFixed(1) + '" cy="' + y.toFixed(1) + '" r="' + r.toFixed(2) +
+        '" fill="url(#d)" opacity="' + o.toFixed(2) + '"/>';
+    }
+    var runs = '';
+    var runsN = Math.round(w / 42);
+    for (i = 0; i < runsN; i++) {
+      x = Math.random() * w;
+      y = Math.random() * h * 0.9;
+      len = 55 + Math.random() * 360;
+      rw = 0.9 + Math.random() * 2.6;
+      runs += '<rect x="' + x.toFixed(1) + '" y="' + y.toFixed(1) + '" width="' + rw.toFixed(2) +
+        '" height="' + len.toFixed(0) + '" rx="1" fill="url(#r)" opacity="' +
+        (0.14 + Math.random() * 0.30).toFixed(2) + '"/>';
+    }
+    var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="' + w + '" height="' + h + '">' +
+      '<defs>' +
+      '<radialGradient id="d" cx="34%" cy="28%" r="70%">' +
+      '<stop offset="0%" stop-color="#ffffff" stop-opacity="0.95"/>' +
+      '<stop offset="26%" stop-color="#ffffff" stop-opacity="0.28"/>' +
+      '<stop offset="70%" stop-color="#08121a" stop-opacity="0.16"/>' +
+      '<stop offset="100%" stop-color="#08121a" stop-opacity="0.55"/>' +
+      '</radialGradient>' +
+      '<linearGradient id="r" x1="0" y1="0" x2="0" y2="1">' +
+      '<stop offset="0%" stop-color="#ffffff" stop-opacity="0.5"/>' +
+      '<stop offset="55%" stop-color="#ffffff" stop-opacity="0.08"/>' +
+      '<stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>' +
+      '</linearGradient>' +
+      '</defs>' + drops + runs + '</svg>';
+    return 'url("data:image/svg+xml,' + encodeURIComponent(svg) + '")';
+  }
+
+  function paintRain() {
+    var w = Math.max(window.innerWidth, 900);
+    var h = Math.max(window.innerHeight, 700);
+    document.documentElement.style.setProperty('--rain', makeRainTexture(w, h));
+  }
+
+  // ------------------------------------------------------------ 主题
+  // 五套主题循环切换：夜雨(深) → 晨雾(浅) → 薄荷(浅) → 橘霞(浅) → 暮紫(深)
+  var THEMES = [
+    { id: 'dark',   name: '夜雨', color: '#0b141d', dark: true  },
+    { id: 'light',  name: '晨雾', color: '#e8eff6', dark: false },
+    { id: 'mint',   name: '薄荷', color: '#e6f5ef', dark: false },
+    { id: 'sunset', name: '橘霞', color: '#ffe9e0', dark: false },
+    { id: 'dusk',   name: '暮紫', color: '#150f22', dark: true  }
+  ];
+  var ICON_SUN = '<circle cx="12" cy="12" r="4.2"/><path d="M12 2.6v2.2M12 19.2v2.2M4.4 4.4l1.6 1.6M18 18l1.6 1.6M2.6 12h2.2M19.2 12h2.2M4.4 19.6L6 18M18 6l1.6-1.6"/>';
+  var ICON_MOON = '<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/>';
+
+  function themeOf(id) {
+    for (var i = 0; i < THEMES.length; i++) {
+      if (THEMES[i].id === id) return THEMES[i];
+    }
+    return THEMES[0];
+  }
+
+  function applyTheme(t) {
+    var th = themeOf(t);
+    // 切换时给整页挂 280ms 的颜色过渡，让五套主题是"流过去"而不是"啪一下换掉"。
+    // 首次应用（curTheme 还是空）不加，免得刚打开就看到一层渐变色。
+    if (curTheme && curTheme !== th.id) {
+      document.documentElement.classList.add('theme-fade');
+      clearTimeout(applyTheme._t);
+      applyTheme._t = setTimeout(function () {
+        document.documentElement.classList.remove('theme-fade');
+      }, 320);
+    }
+    document.documentElement.setAttribute('data-theme', th.id);
+    var meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.setAttribute('content', th.color);
+    // 深色主题画太阳（点了会变浅），浅色主题画月亮
+    $('themeIcon').innerHTML = th.dark ? ICON_SUN : ICON_MOON;
+    var btn = $('themeBtn');
+    if (btn) btn.title = '主题：' + th.name + '（点击换个风格）';
+    try { localStorage.setItem('jc.theme.v2', th.id); } catch (e) {}
+    curTheme = th.id;
+    syncTitlebar(th.dark);
+  }
+
+  // 首次打开用晨雾；之后记住上次选的那套，重启还是它（用户 2026-11-04 改的口径）
+  var curTheme = 'light';
+  try { curTheme = themeOf(localStorage.getItem('jc.theme.v2') || 'light').id; } catch (e) {}
+  // 支持 ?theme=mint 直接指定（分享链接、截图核对用）
+  try {
+    var qt = new URLSearchParams(location.search).get('theme');
+    if (qt && themeOf(qt).id === qt) curTheme = qt;
+  } catch (e) {}
+  applyTheme(curTheme);
+  paintRain();
+  $('themeBtn').addEventListener('click', function () {
+    var next = 0;
+    for (var i = 0; i < THEMES.length; i++) {
+      if (THEMES[i].id === curTheme) next = (i + 1) % THEMES.length;
+    }
+    applyTheme(THEMES[next].id);
+    toast('主题：' + THEMES[next].name);
+  });
+
+  // ------------------------------------------------------------ 系统标题栏深浅
+  // 窗口现在是系统标题栏（不再自绘），它只有深/浅两档，跟着主题走。
+  // 主题那层渐变它复刻不了，只能保证深色主题配深色标题栏、浅色配浅色。
+  // 两条路一起走：js_api 直调 + 本地 HTTP 兜底。pywebview 的 api 注入
+  // 偶尔接不上，光靠 js_api 会出现「页面变了、标题栏不动」的情况。
+  function syncTitlebar(dark) {
+    // 不判断 win-app：类名依赖 URL 参数，万一丢了标题栏就不联动。
+    // 浏览器/手机访问时这两下都是空转（服务端没窗口、非本机直接 403），无害。
+    try {
+      var a = window.pywebview && window.pywebview.api;
+      if (a && typeof a.set_dark_titlebar === 'function') a.set_dark_titlebar(!!dark);
+    } catch (e) {}
+    try {
+      fetch('/api/titlebar?dark=' + (dark ? 1 : 0), { method: 'POST' });
+    } catch (e) {}
+  }
+  window.addEventListener('pywebviewready', function () {
+    syncTitlebar(themeOf(curTheme).dark);
+  });
+
+  // ------------------------------------------------------------ 自绘顶栏（备用）
+  // 现在走系统标题栏，run_window 不再带 ?app=1，下面整段不会生效。
+  // 哪天想回到无边框自绘方案：server.py 里把 frameless=True 打开并带上 app=1。
+  (function initWindowBar() {
+    if (!document.documentElement.classList.contains('wbar-on')) return;
+    function api() { return window.pywebview && window.pywebview.api; }
+    function noDrag(el) {
+      // 按钮不能触发窗口拖动（pywebview 的拖拽是靠事件冒泡到 body 触发的）
+      if (el) el.addEventListener('mousedown', function (e) { e.stopPropagation(); });
+    }
+    noDrag($('wMin')); noDrag($('wMax')); noDrag($('wClose'));
+
+    $('wMin').addEventListener('click', function () {
+      var a = api(); if (a && a.minimize) a.minimize();
+    });
+    $('wClose').addEventListener('click', function () {
+      var a = api(); if (a && a.close_window) a.close_window();
+    });
+
+    var ICON_MAX = '<rect x="1.2" y="1.2" width="7.6" height="7.6" rx="1"/>';
+    var ICON_REST = '<rect x="1.2" y="2.8" width="6" height="6" rx="1"/><path d="M3.2 2.8V1.2h5.6v5.6H7.2"/>';
+    function paintMax(isMax) {
+      $('wMaxIcon').innerHTML = isMax ? ICON_REST : ICON_MAX;
+      $('wMax').title = isMax ? '还原' : '最大化';
+    }
+    function toggleMax() {
+      var a = api(); if (!a || !a.toggle_maximize) return;
+      var r = a.toggle_maximize();
+      if (r && r.then) r.then(function (v) { paintMax(!!v); });
+    }
+    $('wMax').addEventListener('click', toggleMax);
+    document.querySelector('.wbar').addEventListener('dblclick', function (e) {
+      if (e.target.closest('.wbar-btns')) return;
+      toggleMax();
+    });
+  })();
+
+  // ------------------------------------------------------------ 滚动
+  function nearBottom() {
+    return stream.scrollHeight - stream.scrollTop - stream.clientHeight < 160;
+  }
+  function toBottom(force) {
+    if (force || nearBottom()) stream.scrollTop = stream.scrollHeight;
+  }
+
+  // ------------------------------------------------------------ 渲染
+  function el(tag, cls, txt) {
+    var n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (txt != null) n.textContent = txt;
+    return n;
+  }
+
+  // ------------------------------------------------------------ 在文件夹中显示
+  // 传完文件还得自己去翻下载目录太麻烦，这里点一下直接在资源管理器里选中该文件。
+  var FOLDER_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" ' +
+    'stroke-linecap="round" stroke-linejoin="round" width="100%" height="100%">' +
+    '<path d="M3.5 7.6a1.6 1.6 0 0 1 1.6-1.6h3.3l1.5 1.9h8.9a1.6 1.6 0 0 1 1.6 1.6v7.7a1.6 1.6 0 0 1-1.6 1.6H5.1a1.6 1.6 0 0 1-1.6-1.6z"/></svg>';
+
+  // 方框 + 箭头出框：通用「打开 / 用其它程序打开」语意，比下载箭头好认
+  var OPEN_SVG = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" ' +
+    'stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">' +
+    '<path d="M13.5 4.5H20v6.5"/><path d="M20 4.5 11.5 13"/>' +
+    '<path d="M18 14.5v4a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 4 18.5v-11A1.5 1.5 0 0 1 5.5 6h4"/></svg>';
+
+  // path 是落盘后的真实路径；没有时后端按 stored 反查（兼容旧消息）
+  // name 只有手机端用得上：手机 App 里文件在手机上，要开手机自己的文件夹
+  function revealFile(stored, path, name) {
+    if (window.AndroidBridge && window.AndroidBridge.revealFile) {
+      try {
+        window.AndroidBridge.revealFile(name || '');
+      } catch (e) {
+        toast('打不开文件夹');
+      }
+      return Promise.resolve({ ok: true });
+    }
+    return req('/api/reveal', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ stored: stored || '', path: path || '' })
+    }, 8000).then(function (r) {
+      if (r && r.ok) return r;
+      var msg = '打不开文件夹';
+      if (r && r.need_auth) msg = '需要登录';
+      else if (r && r.error) msg = r.error;
+      toast(msg);
+      return r;
+    }).catch(function () {
+      toast('打不开文件夹');
+    });
+  }
+
+  // 「这个页面是不是跑在这台电脑上」。exe 窗口和本机浏览器都是 127.0.0.1；
+  // 局域网里别人的电脑、公网访客都不是 —— 他们点「打开」应该开自己设备上的文件，
+  // 所以那边保持「下载」。服务端 /api/info 会返回 local 做权威判定，
+  // 还没拿到 info 时先按 hostname 猜（exe 窗口一定命中）。
+  function isLocalPage() {
+    if (typeof window.JC_LOCAL === 'boolean') return window.JC_LOCAL;
+    var h = location.hostname;
+    return h === '127.0.0.1' || h === 'localhost' || h === '::1' || h === '[::1]';
+  }
+
+  // 电脑本机点「打开」：文件早就在这台电脑磁盘上了，直接交给系统默认程序。
+  function openLocalFile(stored, path) {
+    return req('/api/open', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ stored: stored || '', path: path || '' })
+    }, 8000).then(function (r) {
+      if (r && r.ok) return r;
+      toast((r && r.error) || '打不开这个文件');
+      return r;
+    }).catch(function () {
+      toast('打不开这个文件');
+    });
+  }
+
+  function revealBtn(stored, path, mini, name) {
+    var b = el('button', mini ? 'rv-mini' : 'rv');
+    b.type = 'button';
+    b.title = '在文件夹中显示';
+    b.innerHTML = FOLDER_SVG;
+    if (mini) { b.style.width = b.style.height = '18px'; }
+    b.addEventListener('click', function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      revealFile(stored, path, name);
+    });
+    return b;
+  }
+
+  var LINK_RE = /(https?:\/\/[^\s<>"']+)/gi;
+
+  function fillText(node, text) {
+    var last = 0, m;
+    LINK_RE.lastIndex = 0;
+    while ((m = LINK_RE.exec(text)) !== null) {
+      if (m.index > last) node.appendChild(document.createTextNode(text.slice(last, m.index)));
+      var a = document.createElement('a');
+      a.href = m[0];
+      a.target = '_blank';
+      a.rel = 'noopener';
+      a.textContent = m[0];
+      node.appendChild(a);
+      last = m.index + m[0].length;
+    }
+    if (last < text.length) node.appendChild(document.createTextNode(text.slice(last)));
+    if (!node.childNodes.length) node.textContent = text;
+  }
+
+  function buildStamp(t) {
+    var s = el('div', 'stamp', fmtFull(t));
+    return s;
+  }
+
+  function buildMsg(m) {
+    var mine = m.client && m.client === CID;
+    var wrap = el('div', 'msg' + (mine ? ' mine' : ''));
+    wrap.dataset.id = m.id;
+
+    var bubble;
+    if (m.type === 'file') {
+      var f = m.file || {};
+      bubble = el('div', 'bubble file');
+      var thumb = el('div', 'thumb');
+      var mime = f.mime || '';
+      var isImg = mime.indexOf('image/') === 0;
+      var isVideo = mime.indexOf('video/') === 0;
+      var isAudio = mime.indexOf('audio/') === 0;
+      if (isImg) {
+        var img = document.createElement('img');
+        img.src = '/p/' + m.id;
+        img.alt = f.name || '';
+        img.loading = 'lazy';
+        img.addEventListener('click', function () { openLightbox('/p/' + m.id); });
+        thumb.appendChild(img);
+      } else if (isVideo) {
+        // #t=0.6 让浏览器把视频第 0.6 秒的画面渲染出来当封面
+        var vid = document.createElement('video');
+        vid.src = '/p/' + m.id + '#t=0.6';
+        vid.muted = true;
+        vid.preload = 'metadata';
+        vid.setAttribute('playsinline', '');
+        vid.setAttribute('webkit-playsinline', '');
+        thumb.appendChild(vid);
+        thumb.appendChild(playBadge());
+        thumb.title = '点击播放';
+        thumb.addEventListener('click', function () { openMedia(m); });
+      } else if (isAudio) {
+        thumb.classList.add('audio');
+        thumb.appendChild(audioGlyph());
+        thumb.appendChild(playBadge('small'));
+        thumb.title = '点击播放';
+        thumb.addEventListener('click', function () { openMedia(m); });
+      } else {
+        var ext = (f.name || '').split('.').pop();
+        if (ext && ext.length <= 5 && ext !== f.name) thumb.appendChild(el('span', 'ext', ext));
+        else thumb.appendChild(extIcon());
+      }
+      var info = el('div', 'finfo');
+      info.appendChild(el('div', 'fname', f.name || '未知文件'));
+      var size = el('div', 'fsize');
+      size.appendChild(document.createTextNode(fmtSize(f.size || 0)));
+      size.appendChild(el('span', 'fdate', fmtDate(m.time)));
+      info.appendChild(size);
+      bubble.appendChild(thumb);
+      bubble.appendChild(info);
+      wrap._search = (f.name || '').toLowerCase();
+      // 收到的文件，右侧那个圆钮按「文件在哪」分三种：
+      //   手机 App   → 打开（App 早把文件存进 下载/简传Lite，本地没有才下载再开）
+      //   电脑本机   → 打开（文件就在这台电脑磁盘上，交给系统默认程序）
+      //   远程浏览器 → 下载（局域网别人的电脑 / 公网访客，只能带走一份）
+      if (!mine) {
+        // 「在文件夹中显示」：电脑上定位到资源管理器，手机上调系统目录
+        bubble.appendChild(revealBtn(f.stored || '', (m.saved && m.saved.path) || '', false, f.name || ''));
+        var fileUrl = '/f/' + m.id;
+        var fileMime = f.mime || '';
+        var storedName = f.stored || '';
+        var savedPath = (m.saved && m.saved.path) || '';
+        var openMode = '';
+        if (window.AndroidBridge && typeof window.AndroidBridge.openFile === 'function') {
+          openMode = 'phone';
+        } else if (isLocalPage()) {
+          openMode = 'local';
+        }
+        if (openMode) {
+          var op = el('button', 'dl');
+          op.type = 'button';
+          op.title = '打开';
+          op.innerHTML = OPEN_SVG;
+          op.addEventListener('click', function (e) {
+            e.stopPropagation();
+            e.preventDefault();
+            if (openMode === 'phone') {
+              try {
+                window.AndroidBridge.openFile(location.origin + fileUrl, f.name || 'file', fileMime);
+              } catch (err) {}
+            } else {
+              openLocalFile(storedName, savedPath);
+            }
+          });
+          bubble.appendChild(op);
+        } else {
+          var dl = el('a', 'dl');
+          dl.href = fileUrl;
+          dl.setAttribute('download', f.name || '');
+          dl.title = '下载';
+          dl.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5v11"/><path d="M7.5 10.5 12 15l4.5-4.5"/><path d="M4.5 19.5h15"/></svg>';
+          bubble.appendChild(dl);
+          // 旧版 App 没有 openFile：仍是下载，走原生保存（绕开系统下载管理器对 http 明文地址的限制）
+          if (window.AndroidBridge && window.AndroidBridge.saveFile) {
+            dl.addEventListener('click', function (e) {
+              e.preventDefault();
+              window.AndroidBridge.saveFile(location.origin + fileUrl, f.name || 'file', fileMime);
+            });
+          }
+        }
+      }
+    } else {
+      bubble = el('div', 'bubble text');
+      fillText(bubble, m.text || '');
+      wrap._search = (m.text || '').toLowerCase();
+    }
+
+    var meta = el('div', 'meta');
+    var who = document.createElement('span');
+    who.textContent = mine ? '我' : (m.device || '设备');
+    if (mine) who.className = 'me-tag';
+    meta.appendChild(who);
+    meta.appendChild(document.createTextNode(' · ' + (m.ip || '')));
+
+    // 文本消息：一键复制，电脑和手机之间当剪贴板用
+    if (m.type !== 'file') {
+      var cp = el('button', 'act copy');
+      cp.title = '复制这段文字';
+      cp.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2.4"/><path d="M5 15V5a2 2 0 0 1 2-2h8"/></svg>';
+      cp.addEventListener('click', function (e) {
+        e.stopPropagation();
+        copyText(m.text || '').then(function (ok) {
+          if (ok) toast('已复制 · 到另一台设备直接粘贴');
+          else showCopyFallback(m.text || '');
+        });
+      });
+      meta.appendChild(cp);
+    }
+
+    var del = el('button', 'act del');
+    del.title = '删除';
+    del.innerHTML = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>';
+    del.addEventListener('click', function () { removeMsg(m.id); });
+    meta.appendChild(del);
+
+    wrap.appendChild(bubble);
+    wrap.appendChild(meta);
+    return wrap;
+  }
+
+  function extIcon() {
+    var s = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    s.setAttribute('width', '26');
+    s.setAttribute('height', '26');
+    s.setAttribute('viewBox', '0 0 24 24');
+    s.setAttribute('fill', 'none');
+    s.setAttribute('stroke', 'currentColor');
+    s.setAttribute('stroke-width', '1.5');
+    s.setAttribute('stroke-linecap', 'round');
+    s.setAttribute('stroke-linejoin', 'round');
+    s.innerHTML = '<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/>';
+    return s;
+  }
+
+  function playBadge(cls) {
+    var b = el('span', 'play-badge' + (cls ? ' ' + cls : ''));
+    b.innerHTML = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.4v13.2L19 12z"/></svg>';
+    return b;
+  }
+
+  function audioGlyph() {
+    var s = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    s.setAttribute('class', 'audio-glyph');
+    s.setAttribute('viewBox', '0 0 24 24');
+    s.setAttribute('fill', 'none');
+    s.setAttribute('stroke', 'currentColor');
+    s.setAttribute('stroke-width', '1.7');
+    s.setAttribute('stroke-linecap', 'round');
+    s.setAttribute('stroke-linejoin', 'round');
+    s.innerHTML = '<path d="M9 17.5V5.2l10-2v12.3"/><circle cx="6.4" cy="17.6" r="2.6"/><circle cx="16.4" cy="15.6" r="2.6"/>';
+    return s;
+  }
+
+  // 音视频播放：点击缩略图弹出播放器（视频走 <video>，音频走 <audio> + 转盘封面）
+  var mediaMid = 0, mediaBaseTitle = '';
+
+  function mediaNote(extra) {
+    var el = $('mediaTitle');
+    if (el) el.textContent = mediaBaseTitle + (extra ? ' · ' + extra : '');
+  }
+
+  // 外挂字幕：同目录下和视频同名的 srt/ass，由服务端转成 WebVTT 再挂上来。
+  // 浏览器不会因为 track 带 default 就真的显示，必须把 textTracks[i].mode 拨到 showing。
+  function clearTracks(v) {
+    if (!v) return;
+    var ts = v.querySelectorAll('track');
+    for (var i = 0; i < ts.length; i++) ts[i].parentNode.removeChild(ts[i]);
+  }
+
+  function loadSubs(id, v) {
+    clearTracks(v);
+    if (!id) return;
+    fetch('/api/subs?id=' + id, { cache: 'no-store' })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (d) {
+        var subs = (d && d.subs) || [];
+        if (!subs.length) return;
+        subs.forEach(function (s, i) {
+          var t = document.createElement('track');
+          t.kind = 'subtitles';
+          t.label = s.label || s.tag || '字幕';
+          t.srclang = s.lang || 'zh';
+          t.src = s.url;
+          if (i === 0) t.default = true;
+          v.appendChild(t);
+        });
+        setTimeout(function () {
+          try {
+            var list = v.textTracks;
+            for (var i = 0; i < list.length; i++) list[i].mode = i === 0 ? 'showing' : 'hidden';
+          } catch (e) {}
+        }, 240);
+        mediaNote('字幕 ' + subs.length + ' 条 · ' + (subs[0].label || subs[0].tag || ''));
+      })
+      .catch(function () {});
+  }
+
+  // 播放地址：投影仪 / 电视的 VLC 打开网络串流时用。
+  // 不能用浏览器的地址 —— 在本机 exe 窗口里那是 127.0.0.1，投影仪连过去是它自己。
+  function mediaShareUrl(id) {
+    var base = baseUrl || location.origin || '';
+    if (/\/\/(127\.0\.0\.1|localhost)([:/]|$)/.test(base) && lanIps.length) {
+      base = 'http://' + lanIps[0] + ':' + (location.port || '8787');
+    }
+    return base.replace(/\/+$/, '') + '/p/' + id;
+  }
+
+  // 手机 App 的 WebView 里能调起原生播放器（libVLC）：MKV、音轨切换、ASS 特效字幕
+  // 全都有；电脑浏览器没有这个桥，照旧用 <video>。
+  // 注意 path 一定要给：播放器拿它做进度记忆的 key，也用来自报「同目录有哪些字幕」。
+  function openNative(m) {
+    if (!window.AndroidBridge || !window.AndroidBridge.openPlayer) return false;
+    var f = m.file || {};
+    if ((f.mime || '').indexOf('video/') !== 0) return false;
+    var ids = Object.keys(fileMsgs).sort(function (a, b) { return a - b; });
+    var vids = [], idx = 0;
+    for (var i = 0; i < ids.length; i++) {
+      var x = fileMsgs[ids[i]];
+      if ((x.file && x.file.mime || '').indexOf('video/') !== 0) continue;
+      if (+ids[i] === +m.id) idx = vids.length;
+      vids.push(x);
+    }
+    if (!vids.length) return false;
+    var origin = location.protocol + '//' + location.host;
+    var arr = [];
+    for (var j = 0; j < vids.length; j++) {
+      var v = vids[j], vf = v.file || {};
+      arr.push({
+        name: vf.name || '',
+        url: origin + '/p/' + v.id,
+        path: (v.saved && v.saved.path) ? v.saved.path : ''
+      });
+    }
+    try {
+      window.AndroidBridge.openPlayer(JSON.stringify(arr), idx);
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function openMedia(m) {
+    var f = m.file || {};
+    var mime = f.mime || '';
+    // 手机上看视频优先交给原生播放器，放不了才退回网页 <video>
+    if (mime.indexOf('video/') === 0 && openNative(m)) return;
+    var v = $('mediaVideo'), a = $('mediaAudio'), cover = $('mediaCover');
+    var cast = $('mediaCast');
+    closeMedia(true);
+    mediaMid = m.id;
+    mediaBaseTitle = (f.name || '') + ' · ' + fmtSize(f.size || 0);
+    var isV = mime.indexOf('video/') === 0;
+    var isA = mime.indexOf('audio/') === 0;
+    if (cast) cast.classList.toggle('on', isV || isA);
+    if (isV) {
+      v.style.display = 'block';
+      a.style.display = 'none';
+      cover.style.display = 'none';
+      v.onerror = function () { toast('这个视频格式浏览器可能放不了，建议点右侧按钮下载'); };
+      v.src = '/p/' + m.id;
+      var pp = v.play();
+      if (pp && pp.catch) pp.catch(function () {});
+      loadSubs(m.id, v);
+    } else if (isA) {
+      v.style.display = 'none';
+      a.style.display = 'block';
+      cover.style.display = 'grid';
+      a.onerror = function () { toast('这个音频格式浏览器可能放不了，建议点右侧按钮下载'); };
+      a.src = '/p/' + m.id;
+      var ap = a.play();
+      if (ap && ap.catch) ap.catch(function () {});
+    }
+    mediaNote('');
+    $('mediaModal').classList.add('on');
+  }
+
+  function closeMedia(keepOpen) {
+    var v = $('mediaVideo'), a = $('mediaAudio');
+    if (v) {
+      v.onerror = null;
+      clearTracks(v);
+      try { v.pause(); } catch (e) {}
+      v.removeAttribute('src');
+      try { v.load(); } catch (e) {}
+    }
+    if (a) {
+      a.onerror = null;
+      try { a.pause(); } catch (e) {}
+      a.removeAttribute('src');
+      try { a.load(); } catch (e) {}
+    }
+    var cover = $('mediaCover');
+    if (cover) cover.classList.remove('spin');
+    var cast = $('mediaCast');
+    if (cast) cast.classList.remove('on');
+    if (!keepOpen) { mediaMid = 0; $('mediaModal').classList.remove('on'); }
+  }
+
+  (function () {
+    var cast = $('mediaCast');
+    if (!cast) return;
+    cast.addEventListener('click', function () {
+      var u = mediaShareUrl(mediaMid);
+      copyText(u).then(function (ok) {
+        if (ok) toast('播放地址已复制');
+        else showCopyFallback(u);
+      });
+    });
+  })();
+
+  // 已经画到页面上的消息 id。换网络时多个请求会同时返回同一批数据，
+  // 靠它保证每条只画一次 —— 否则就会出现「一条消息重复六遍」。同时顺带修正 lastId。
+  var seen = Object.create(null);
+
+  // 文件消息的索引（id → 消息）。手机 App 里调原生播放器要「整个视频列表」做选集，
+  // DOM 里只有 id 没有 mime/path，所以单独留一份轻量的。
+  var fileMsgs = Object.create(null);
+
+  function appendMsg(m, silent) {
+    if (!m || seen[m.id]) return false;
+    seen[m.id] = 1;
+    if (m.type === 'file') fileMsgs[m.id] = m;
+    // 手机 App 里：新收到的文件自动下载到手机（只在增量新消息时触发，历史不重下）
+    if (m.type === 'file' && m.client !== CID &&
+        window.AndroidBridge && window.AndroidBridge.saveFile) {
+      var _af = m.file || {};
+      try {
+        window.AndroidBridge.saveFile(location.origin + '/f/' + m.id, _af.name || 'file', _af.mime || '');
+      } catch (e) {}
+    }
+    var atBottom = nearBottom();
+    if (emptyBox) emptyBox.style.display = 'none';
+    if (m.time - lastStamp > 180) {
+      inner.insertBefore(buildStamp(m.time), pendingBox);
+      lastStamp = m.time;
+    } else if (m.time > lastStamp) {
+      lastStamp = m.time;
+    }
+    var node = buildMsg(m);
+    inner.insertBefore(node, pendingBox);
+    // 刚到的文件弹一下（10 秒内才算"刚到"，否则刷新页面时整屏历史都会跳）。
+    // 自己发的、以及历史回填的都不弹。
+    if (m.type === 'file' && m.client !== CID && (Date.now() / 1000 - m.time) < 10) {
+      node.classList.add('fresh');
+      // 卡片右上角飘一个「+12.3 MB」，告知这次到底落了多大东西
+      var bub = node.querySelector('.bubble');
+      if (bub) bub.setAttribute('data-gain', '+' + fmtSize(m.size || 0));
+      setTimeout(function () { node.classList.remove('fresh'); }, 1700);
+    }
+    if (!silent) toBottom(atBottom);
+    return true;
+  }
+
+  function renderAll(list) {
+    Array.prototype.slice.call(inner.querySelectorAll('.msg, .stamp')).forEach(function (n) { n.remove(); });
+    seen = Object.create(null);
+    fileMsgs = Object.create(null);
+    lastStamp = 0;
+    if (!list.length) {
+      if (emptyBox) emptyBox.style.display = '';
+      stream.scrollTop = 0;
+      return;
+    }
+    if (emptyBox) emptyBox.style.display = 'none';
+    list.forEach(function (m) {
+      seen[m.id] = 1;
+      if (m.type === 'file') fileMsgs[m.id] = m;
+      if (m.id > lastId) lastId = m.id;
+      if (m.time - lastStamp > 180) {
+        inner.insertBefore(buildStamp(m.time), pendingBox);
+        lastStamp = m.time;
+      } else if (m.time > lastStamp) {
+        lastStamp = m.time;
+      }
+      inner.insertBefore(buildMsg(m), pendingBox);
+    });
+    // 首屏前 8 条一条接一条浮上来（每条晚 45ms），整屏 360ms 内落定。
+    // 只给前 8 条设延迟：历史有上百条时，后面的消息不该干等。
+    var first = inner.querySelectorAll('.msg');
+    for (var i = 0; i < Math.min(first.length, 8); i++) {
+      first[i].style.animationDelay = (i * 45) + 'ms';
+    }
+    stream.scrollTop = stream.scrollHeight;
+  }
+
+  function removeMsg(id) {
+    fetch('/api/delete', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: id })
+    }).then(function (r) { return r.json(); }).then(function (d) {
+      if (d.ok) {
+        var node = inner.querySelector('.msg[data-id="' + id + '"]');
+        if (node) node.remove();
+        delete fileMsgs[id];
+        totalCount = Math.max(0, totalCount - 1);
+        $('msgCount').textContent = totalCount;
+        toast('已删除');
+      }
+    }).catch(function () { toast('删除失败'); });
+  }
+
+  // ------------------------------------------------------------ 轮询
+  var onlineShown = -1;
+  function updateOnline(list) {
+    list = list || [];
+    var label = $('onlineMiniText');
+    if (label) {
+      // 数量变了才重触发滚动，否则每次轮询（2 秒一次）都会重播一遍
+      if (onlineShown !== list.length) {
+        onlineShown = list.length;
+        label.innerHTML = '';
+        var b = document.createElement('b');
+        b.textContent = String(list.length);
+        label.appendChild(b);
+        label.appendChild(document.createTextNode(' 台在线'));
+        b.className = 'tick';
+      }
+    }
+    var box = $('onlineList');
+    if (!box) return;
+    box.innerHTML = '';
+    if (!list.length) {
+      box.innerHTML = '<div class="online-item"><span class="ip">暂无</span></div>';
+      return;
+    }
+    list.slice(0, 6).forEach(function (c) {
+      var row = el('div', 'online-item');
+      row.appendChild(el('span', 'd'));
+      row.appendChild(el('span', null, (c.id === CID ? '本机 · ' : '') + (c.device || '设备')));
+      row.appendChild(el('span', 'ip', c.ip || ''));
+      box.appendChild(row);
+    });
+  }
+
+  // 带超时的请求：手机切网络时旧连接会挂死几十秒，不设超时就会积压
+  function req(url, opts, ms) {
+    opts = opts || {};
+    var timer = null;
+    if (typeof AbortController !== 'undefined') {
+      var ctl = new AbortController();
+      opts.signal = ctl.signal;
+      timer = setTimeout(function () { ctl.abort(); }, ms || 12000);
+    }
+    return fetch(url, opts).then(function (r) {
+      if (timer) { clearTimeout(timer); timer = null; }
+      if (!r.ok) {
+        if (r.status === 401) return { need_auth: true };
+        return r.text().then(function (t) {
+          var msg = 'HTTP ' + r.status;
+          try { msg = JSON.parse(t).error || msg; } catch (e) {}
+          throw new Error(msg);
+        });
+      }
+      return r.json();
+    }, function (e) {
+      if (timer) { clearTimeout(timer); timer = null; }
+      throw e;
+    });
+  }
+
+  var polling = false, pollAgain = false, bootRetry = 0;
+
+  function poll(initial) {
+    // 串行：同一时刻只允许一个请求在途。
+    // 否则断网期间发出的请求会全部挂起，网络一恢复同时返回同一批数据 → 重复渲染。
+    if (polling) { pollAgain = true; return Promise.resolve([]); }
+    polling = true;
+    var url = '/api/messages?after=' + (initial ? 0 : lastId) + '&client=' + encodeURIComponent(CID);
+    return req(url, { cache: 'no-store' }, 10000).then(function (d) {
+      if (d && d.need_auth) { showLogin(); return []; }
+      var list = d.messages || [];
+      if (initial) {
+        renderAll(list);
+        totalCount = d.total || list.length;
+        bootRetry = 0;
+      } else if (list.length) {
+        var atBottom = nearBottom();
+        for (var i = 0; i < list.length; i++) appendMsg(list[i], true);
+        var maxId = list[list.length - 1].id;
+        if (maxId > lastId) lastId = maxId;
+        if (atBottom) toBottom(true);
+        totalCount = d.total || (totalCount + list.length);
+      }
+      $('msgCount').textContent = totalCount;
+      updateOnline(d.online || []);
+      // 这条轮询通了 = 连接是好的。必须在这里清零失败计数：
+      // 如果只在 setChan 里清，那「灯已经是绿的」时成功的轮询就不会调 setChan，
+      // 失败计数会一路累加，几次之后就把好连接误判成断线（这就是灯乱跳的真凶）。
+      chanOk();
+      // 灯是灰的但这条请求通了 → 说明刚恢复，立刻补探一次把灯点亮。
+      // 光靠 poll 只知道「通了」，不知道走的是局域网还是公网，所以还得问 /api/info。
+      if (chanState === '' || chanState === 'lost') probeNow();
+      // 剪贴板：电脑发过来的内容 → 写进手机剪贴板。
+      // 后端只把这个字段喂给 App 的 WebView（UA 带 简传LiteApp），电脑浏览器收不到，
+      // 所以不会出现「两个客户端抢同一条待发内容」的问题。
+      if (d.clips && d.clips.length) {
+        for (var ci = 0; ci < d.clips.length; ci++) {
+          var ct = d.clips[ci] && d.clips[ci].text;
+          if (!ct) continue;
+          if (window.AndroidBridge && window.AndroidBridge.setClipboard) {
+            try { window.AndroidBridge.setClipboard(ct); } catch (e) {}
+          }
+        }
+      }
+      applyFilter();
+      return list;
+    }).catch(function () {
+      // 消息拉不到 → 记一次失败。连续两次才把灯点灰，单次超时不再当成断线
+      // （WiFi 丢包 / 浏览器挂起标签页都会造成单次失败，以前就会闪一下）。
+      chanFail();
+      // 首次加载失败（常见于刚切网络那一刻）→ 自己退避重试，不用用户手动刷新第二遍
+      if (initial) {
+        bootRetry += 1;
+        if (bootRetry === 1) toast('连接中断，正在自动重连…');
+        setTimeout(function () { poll(true); }, Math.min(1200 * bootRetry, 6000));
+      }
+      return [];
+    }).then(function (list) {
+      polling = false;
+      if (pollAgain) { pollAgain = false; setTimeout(function () { poll(false); }, 40); }
+      return list;
+    });
+  }
+
+  // ------------------------------------------------------------ 搜索
+  $('searchBtn').addEventListener('click', function () {
+    var w = $('searchWrap');
+    w.classList.toggle('open');
+    if (w.classList.contains('open')) $('searchInput').focus();
+    else { $('searchInput').value = ''; filterText = ''; applyFilter(); }
+  });
+  $('searchInput').addEventListener('input', function (e) {
+    filterText = e.target.value.trim().toLowerCase();
+    applyFilter();
+  });
+  function applyFilter() {
+    var nodes = inner.querySelectorAll('.msg');
+    for (var i = 0; i < nodes.length; i++) {
+      var n = nodes[i];
+      if (!filterText) { n.style.display = ''; continue; }
+      n.style.display = (n._search || '').indexOf(filterText) >= 0 ? '' : 'none';
+    }
+  }
+
+  $('refreshBtn').addEventListener('click', function () {
+    poll(true).then(function () { toast('已刷新'); });
+  });
+
+  // ------------------------------------------------------------ 发送文本
+  function autoGrow() {
+    input.style.height = 'auto';
+    input.style.height = Math.min(input.scrollHeight, 150) + 'px';
+  }
+  input.addEventListener('input', autoGrow);
+  input.addEventListener('focus', function () { $('composer').classList.add('focus'); });
+  input.addEventListener('blur', function () { $('composer').classList.remove('focus'); });
+
+  // 手机上那串「Enter 发送 / Shift+Enter 换行」的占位文字会挤成三行，
+  // 而手机根本没有这两个键。窄屏换成一句短的，输入框能保持一行高。
+  if (window.matchMedia('(max-width:640px)').matches) {
+    input.placeholder = '说点什么…';
+  }
+
+  // 发送锁 + 去重键：连点、网络抖动、响应丢失都不会产生重复消息
+  var sending = false, pendingText = '', pendingDedupe = null;
+
+  function newKey() {
+    return CID + '-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8);
+  }
+
+  function sendText() {
+    var text = input.value.trim();
+    if (!text || sending) return;
+
+    // 同一段文字重发时复用同一个 key：如果是「服务端其实收到了、只是响应没回来」，
+    // 服务端会认出这是重复请求，直接返回原来那条，不会再存一份。
+    if (!(pendingText === text && pendingDedupe)) {
+      pendingText = text;
+      pendingDedupe = newKey();
+    }
+    var key = pendingDedupe;
+
+    sending = true;
+    $('sendBtn').disabled = true;
+    input.value = '';
+    autoGrow();
+
+    req('/api/send', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text: text, client: CID, dedupe: key })
+    }, 15000).then(function (d) {
+      if (d && d.need_auth) { showLogin(); return; }
+      pendingText = '';
+      pendingDedupe = null;
+      if (d && d.message) appendMsg(d.message, false);   // 先本地显示，不用等轮询
+      return poll(false);
+    }).catch(function (e) {
+      if (!input.value) { input.value = text; autoGrow(); }   // 失败别把字弄丢
+      toast('发送失败：' + (e && e.message ? e.message : '网络异常'));
+    }).then(function () {
+      sending = false;
+      $('sendBtn').disabled = false;
+    });
+  }
+
+  input.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) {
+      e.preventDefault();
+      sendText();
+    }
+  });
+  $('sendBtn').addEventListener('click', sendText);
+
+  // ------------------------------------------------------------ 上传
+  var queue = [], active = 0, MAX_CONC = 2;
+
+  function enqueue(file) {
+    queue.push(file);
+    pump();
+  }
+  function pump() {
+    while (active < MAX_CONC && queue.length) {
+      var f = queue.shift();
+      active++;
+      doUpload(f);
+    }
+  }
+
+  function doUpload(file) {
+    var mine = file.client === undefined;
+    var name = file.name || ('粘贴内容_' + Date.now() + '.png');
+    var holder = el('div', 'msg mine pending');
+    var bubble = el('div', 'bubble file');
+    var thumb = el('div', 'thumb');
+    var info = el('div', 'finfo');
+    info.appendChild(el('div', 'fname', name));
+    var fs = el('div', 'fsize');
+    fs.appendChild(document.createTextNode(fmtSize(file.size)));
+    var pmeta = el('div', 'pmeta', '准备中…');
+    var pnum = document.createElement('b');
+    var pspd = document.createElement('span');
+    var prog = el('div', 'progress');
+    var bar = document.createElement('i');
+    prog.appendChild(bar);
+    // 进度条右边挂「取消」：传到一半想反悔，之前只能等它跑完或者关页面
+    var prow = el('div', 'prow');
+    var cancelBtn = el('button', 'pcancel', '取消');
+    cancelBtn.type = 'button';
+    prow.appendChild(prog);
+    prow.appendChild(cancelBtn);
+    info.appendChild(fs);
+    info.appendChild(pmeta);
+    info.appendChild(prow);
+    bubble.appendChild(thumb);
+    bubble.appendChild(info);
+    holder.appendChild(bubble);
+    var meta = el('div', 'meta', '正在上传…');
+    holder.appendChild(meta);
+    pendingBox.appendChild(holder);
+    toBottom(true);
+
+    var qs = '?name=' + encodeURIComponent(name) +
+      '&mime=' + encodeURIComponent(file.type || '') +
+      '&client=' + encodeURIComponent(CID) +
+      '&dedupe=' + encodeURIComponent(newKey());
+
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', '/api/upload' + qs);
+    var t0 = Date.now();
+    // 一个请求只允许有一条结局（成功/失败/取消）。都用 settle() 抢，
+    // 否则取消后 xhr.onerror 还会再跑一遍，active 被减两次，并发队列就错位了。
+    var settled = false;
+    function settle() { if (settled) return false; settled = true; return true; }
+    function stopRaf() { if (rafId) { cancelAnimationFrame(rafId); rafId = 0; } }
+    // 百分比逐帧爬：真实进度是 1%→37%→68% 地跳的，直接写 DOM 看着像掉帧。
+    // 用 rAF 缓动追目标值，数字是滚上去的。
+    var shown = 0, target = 0, rafId = 0, numOn = false;
+    function armNum() {
+      if (numOn) return;
+      numOn = true;
+      pmeta.textContent = '';
+      pnum.textContent = '0%';
+      pmeta.appendChild(pnum);
+      pmeta.appendChild(pspd);
+    }
+    function paintNum() {
+      shown += (target - shown) * 0.24;
+      if (target - shown < 0.6) shown = target;
+      pnum.textContent = Math.round(shown) + '%';
+      rafId = shown < target ? requestAnimationFrame(paintNum) : 0;
+    }
+    xhr.upload.onprogress = function (e) {
+      if (!e.lengthComputable) return;
+      var pct = e.loaded / e.total;
+      bar.style.width = (pct * 100).toFixed(1) + '%';
+      armNum();
+      target = pct * 100;
+      if (!rafId) rafId = requestAnimationFrame(paintNum);
+      // 用整体平均速度：瞬时值会来回跳，看着像坏了
+      var sec = Math.max((Date.now() - t0) / 1000, 0.25);
+      pspd.textContent = ' · ' + fmtSize(e.loaded / sec) + '/s';
+    };
+    xhr.onload = function () {
+      if (!settle()) return;
+      active--;
+      if (xhr.status >= 200 && xhr.status < 300) {
+        cancelBtn.remove();              // 传完了就别再给"取消"的错觉
+        // 完成：条填满变绿、数字蹦一下再换成总量、停 1 秒多再收起，
+        // 否则卡片"啪"一下消失，用户根本不知道传完没有
+        stopRaf();
+        armNum();
+        bar.style.width = '100%';
+        prog.classList.add('done');
+        pmeta.className = 'pmeta ok';
+        pspd.textContent = '';
+        pnum.textContent = '100%';
+        pnum.classList.add('pop');
+        holder.classList.add('done');
+        // 先让 100% 蹦一下，260ms 后再把数字换成实际总量，两件事才都看得见
+        setTimeout(function () {
+          pmeta.textContent = '已发送 · ' + fmtSize(file.size);
+        }, 260);
+        setTimeout(function () { holder.remove(); }, 1450);
+        poll(false).then(pump);
+      } else {
+        var msg = '上传失败';
+        try { msg = JSON.parse(xhr.responseText).error || msg; } catch (e) {}
+        toast(msg);
+        stopRaf();
+        holder.remove();
+        pump();
+      }
+    };
+    xhr.onerror = function () {
+      if (!settle()) return;
+      stopRaf();
+      holder.remove(); active--; toast('上传失败，检查连接'); pump();
+    };
+    // 用户点「取消」→ abort() → 只会走这里，不会走 onload / onerror
+    xhr.onabort = function () {
+      if (!settle()) return;
+      stopRaf();
+      active--;
+      var at = Math.round(shown);
+      holder.classList.add('cancelled');
+      pmeta.className = 'pmeta';
+      pmeta.textContent = '已取消 · 中断于 ' + at + '%';
+      pspd.textContent = '';
+      meta.textContent = '已取消';
+      // 不留残影：1.1 秒后撤掉，和"已发送"的 1.45 秒节奏区分开
+      setTimeout(function () { holder.remove(); }, 1100);
+      pump();
+    };
+    cancelBtn.addEventListener('click', function () {
+      if (settled) return;
+      cancelBtn.disabled = true;
+      cancelBtn.textContent = '取消中';
+      try { xhr.abort(); } catch (e) { /* 已经结束了就算了 */ }
+    });
+    xhr.send(file);
+  }
+
+  function addFiles(list) {
+    if (!list || !list.length) return;
+    for (var i = 0; i < list.length; i++) {
+      if (list[i].size > 4 * 1024 * 1024 * 1024) { toast('「' + list[i].name + '」超过 4GB'); continue; }
+      enqueue(list[i]);
+    }
+  }
+
+  function triggerPick() {
+    // 手机 App 里走原生文件选择器（能多选、能传任意文件）
+    if (window.AndroidBridge && window.AndroidBridge.pickFiles) {
+      try { window.AndroidBridge.pickFiles(); return; } catch (e) {}
+    }
+    fileInput.click();
+  }
+  function triggerFolderPick() {
+    // 手机 App 里走原生文件夹选择器（打包成 zip）；网页版走 webkitdirectory
+    if (window.AndroidBridge && window.AndroidBridge.pickFolder) {
+      try { window.AndroidBridge.pickFolder(); return; } catch (e) {}
+    }
+    folderInput.click();
+  }
+  $('pickBtn').addEventListener('click', triggerPick);
+  $('pickNav').addEventListener('click', triggerPick);
+  $('folderBtn').addEventListener('click', triggerFolderPick);
+  fileInput.addEventListener('change', function () {
+    addFiles(fileInput.files);
+    fileInput.value = '';
+  });
+  folderInput.addEventListener('change', function () {
+    var files = folderInput.files;
+    folderInput.value = '';
+    if (!files || !files.length) return;
+    packFolder(files);
+  });
+
+  // 选文件夹 → 用 JSZip 按目录结构打包成 zip → 上传（对方收到一个完整 zip，结构不丢）
+  function packFolder(files) {
+    var rootName = files[0].webkitRelativePath.split('/')[0] || 'folder';
+    if (files.length > 5000) {
+      toast('这个文件夹里有 ' + files.length + ' 个文件，太多了，请分小一点');
+      return;
+    }
+    var total = 0;
+    for (var i = 0; i < files.length; i++) total += files[i].size;
+    if (total > 4 * 1024 * 1024 * 1024) {
+      toast('文件夹超过 4GB，无法一次发送');
+      return;
+    }
+    if (typeof JSZip === 'undefined') {
+      toast('打包组件未加载，请重新启动电脑端');
+      return;
+    }
+    toast('正在打包「' + rootName + '」…');
+    var zip = new JSZip();
+    for (var j = 0; j < files.length; j++) {
+      zip.file(files[j].webkitRelativePath, files[j]);
+    }
+    zip.generateAsync({ type: 'blob', compression: 'STORE' }).then(function (blob) {
+      var zipFile = new File([blob], rootName + '.zip', { type: 'application/zip' });
+      enqueue(zipFile);
+      toast('「' + rootName + '.zip」已加入发送队列');
+    }, function (err) {
+      toast('打包失败：' + (err && err.message ? err.message : err));
+    });
+  }
+
+  // 粘贴
+  document.addEventListener('paste', function (e) {
+    if (e.target === input && !(e.clipboardData && e.clipboardData.files.length)) return;
+    var files = e.clipboardData && e.clipboardData.files;
+    if (files && files.length) {
+      e.preventDefault();
+      var arr = [];
+      for (var i = 0; i < files.length; i++) {
+        var f = files[i];
+        if (f.type.indexOf('image/') === 0 && !f.name) {
+          var ext = f.type.split('/')[1] || 'png';
+          arr.push(new File([f], '粘贴图片_' + Date.now() + '.' + ext, { type: f.type }));
+        } else {
+          arr.push(f);
+        }
+      }
+      addFiles(arr);
+    }
+  });
+
+  // 拖拽
+  var dragDepth = 0, mask = $('dropMask');
+  window.addEventListener('dragenter', function (e) {
+    if (!e.dataTransfer || Array.prototype.indexOf.call(e.dataTransfer.types, 'Files') < 0) return;
+    dragDepth++;
+    mask.classList.add('on');
+  });
+  window.addEventListener('dragover', function (e) { e.preventDefault(); });
+  window.addEventListener('dragleave', function () {
+    dragDepth = Math.max(0, dragDepth - 1);
+    if (!dragDepth) mask.classList.remove('on');
+  });
+  window.addEventListener('drop', function (e) {
+    e.preventDefault();
+    dragDepth = 0;
+    mask.classList.remove('on');
+    if (e.dataTransfer && e.dataTransfer.files.length) addFiles(e.dataTransfer.files);
+  });
+
+  // ------------------------------------------------------------ 清空
+  $('clearNav').addEventListener('click', function () {
+    if (!window.confirm('确定清空全部消息和文件吗？此操作不可恢复。')) return;
+    fetch('/api/clear', { method: 'POST' }).then(function () {
+      lastId = 0; totalCount = 0;
+      renderAll([]);
+      $('msgCount').textContent = '0';
+      toast('已清空');
+    }).catch(function () { toast('操作失败'); });
+  });
+
+  // ------------------------------------------------------------ 复制/二维码
+  function copyText(t) {
+    // 在 App 里（有原生桥）直接写系统剪贴板，http 环境下也 100% 成功
+    if (typeof window.AndroidBridge !== 'undefined' && window.AndroidBridge.copy) {
+      try { window.AndroidBridge.copy(t); return Promise.resolve(true); } catch (e) {}
+    }
+    if (navigator.clipboard && window.isSecureContext) {
+      return navigator.clipboard.writeText(t).then(function () { return true; }).catch(function () { return legacyCopy(t); });
+    }
+    return Promise.resolve(legacyCopy(t));
+  }
+  function legacyCopy(t) {
+    var ta = document.createElement('textarea');
+    ta.value = t;
+    ta.setAttribute('readonly', '');
+    ta.style.position = 'fixed';
+    ta.style.top = '0';
+    ta.style.left = '0';
+    ta.style.width = '1px';
+    ta.style.height = '1px';
+    ta.style.padding = '0';
+    ta.style.border = 'none';
+    ta.style.outline = 'none';
+    ta.style.background = 'transparent';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.focus();
+    ta.select();
+    ta.setSelectionRange(0, t.length);
+    var ok = false;
+    try { ok = document.execCommand('copy'); } catch (e) { ok = false; }
+    if (ta.parentNode) ta.parentNode.removeChild(ta);
+    return ok;
+  }
+
+  // 兜底：浏览器死活不让写剪贴板时，弹一个已经全选的框，让用户自己按 Ctrl+C / 长按复制
+  function showCopyFallback(text) {
+    var ta = $('copyArea');
+    if (!ta) return;
+    ta.value = text;
+    $('copyModal').classList.add('on');
+    setTimeout(function () {
+      ta.focus();
+      ta.select();
+      ta.setSelectionRange(0, text.length);
+    }, 80);
+  }
+  // 左栏「扫码连接」卡：点卡片 = 放大二维码，点地址那行 = 复制。
+  // 分成两个点击区，不然整卡点一下就复制，用户想看大码反而找不到入口。
+  $('scanCard') && $('scanCard').addEventListener('click', function () { openQr(); });
+  $('scanAddr') && $('scanAddr').addEventListener('click', function (e) {
+    e.stopPropagation();                 // 别把"复制"顺手变成"开弹窗"
+    if (!baseUrl) return;
+    copyText(baseUrl).then(function (ok) { toast(ok ? '地址已复制' : '复制失败，请手动选择'); });
+  });
+
+  // 二维码一律走本机 /api/qr。以前这里请求 api.qrserver.com，一断网就是裂图，
+  // 跟"局域网内无需联网"这个卖点自相矛盾。
+  function fillQr(img, text, size) {
+    img.src = '/api/qr?size=' + (size || 240) + '&text=' + encodeURIComponent(text);
+    img.onerror = function () { window.qrFail(img); };
+  }
+
+  function openQr() {
+    if (!baseUrl) return;
+    $('qrUrl').textContent = baseUrl;
+    var box = $('qrBox');
+    box.innerHTML = '';
+    var img = document.createElement('img');
+    img.alt = '二维码';
+    box.appendChild(img);
+    fillQr(img, baseUrl, 300);
+    $('qrModal').classList.add('on');
+  }
+  $('qrBtn').addEventListener('click', openQr);
+  $('infoBtn').addEventListener('click', function () { $('infoModal').classList.add('on'); });
+
+  // 音视频播放器
+  $('mediaClose').addEventListener('click', function () { closeMedia(); });
+  $('mediaModal').addEventListener('click', function (e) {
+    if (e.target === $('mediaModal')) closeMedia();
+  });
+  $('mediaAudio').addEventListener('play', function () { $('mediaCover').classList.add('spin'); });
+  $('mediaAudio').addEventListener('pause', function () { $('mediaCover').classList.remove('spin'); });
+  $('mediaAudio').addEventListener('ended', function () { $('mediaCover').classList.remove('spin'); });
+
+  Array.prototype.slice.call(document.querySelectorAll('[data-close]')).forEach(function (b) {
+    b.addEventListener('click', function () { $(b.getAttribute('data-close')).classList.remove('on'); });
+  });
+  Array.prototype.slice.call(document.querySelectorAll('.modal')).forEach(function (m) {
+    m.addEventListener('click', function (e) { if (e.target === m) m.classList.remove('on'); });
+  });
+
+  // 看大图
+  function openLightbox(src) {
+    $('lightboxImg').src = src;
+    $('lightbox').classList.add('on');
+  }
+  $('lightbox').addEventListener('click', function () { $('lightbox').classList.remove('on'); });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') {
+      $('lightbox').classList.remove('on');
+      closeMedia();
+      Array.prototype.slice.call(document.querySelectorAll('.modal.on')).forEach(function (m) { m.classList.remove('on'); });
+    }
+  });
+
+  // 安卓版 APK：地址随局域网 IP 变，跟着 /api/info 一起刷新
+  var apkUrl = '';
+  // 二维码加载失败时的兜底：给一句能看懂的话，别留一个裂图
+  window.qrFail = function (img) {
+    var p = img && img.parentNode;
+    if (!p) return;
+    p.innerHTML = '<div class="qr-fail">二维码生成失败<br>请手动输入上面的地址</div>';
+  };
+
+  function refreshApkInfo(siteUrl) {
+    fetch('/api/apk', { cache: 'no-store' })
+      .then(function (r) { return r.json(); })
+      .then(function (info) {
+        if (!info || !info.url) return;
+        var url = info.url.replace(/^https?:\/\/[^/]+/, siteUrl || '');
+        apkUrl = url;
+        apkVer_ = info.version || '';
+        apkSize_ = info.size || 0;
+        // 左栏只显示版本号（宽度就那么大），大小放在弹窗的副标题里
+        var v = $('apkVer');
+        if (v) v.textContent = 'v' + (apkVer_ || '1.0');
+      })
+      .catch(function () { });
+  }
+
+  // 安卓版二维码弹窗：左栏那行文字点开才出来。
+  // 左栏常驻两个码时，手机取景框会把两个一起框住、只认出一个。
+  var apkVer_ = '', apkSize_ = 0;
+  function openApkModal() {
+    if (!apkUrl) { toast('安卓包还没准备好'); return; }
+    var sub = $('apkModalSub');
+    if (sub) {
+      sub.textContent = '同一 WiFi 扫码下载' +
+        (apkVer_ ? ' · v' + apkVer_ : '') +
+        (apkSize_ ? ' · ' + (apkSize_ / 1048576).toFixed(1) + ' MB' : '');
+    }
+    var urlBox = $('apkModalUrl');
+    if (urlBox) urlBox.textContent = apkUrl;
+    var img = $('apkQrBig');
+    if (img) fillQr(img, apkUrl, 300);
+    $('apkModal').classList.add('on');
+  }
+  $('apkLine') && $('apkLine').addEventListener('click', openApkModal);
+  $('apkDlBtn') && $('apkDlBtn').addEventListener('click', function () {
+    if (apkUrl) location.href = apkUrl;
+  });
+  $('apkCopyBtn') && $('apkCopyBtn').addEventListener('click', function () {
+    if (!apkUrl) return;
+    copyText(apkUrl).then(function (ok) { toast(ok ? '下载链接已复制' : '复制失败'); });
+  });
+
+  // ------------------------------------------------------------ 剪贴板同步
+  var clipState = null;
+  var clipAutoTried = false;
+
+  function renderClipboard(st) {
+    if (!st) return;
+    clipState = st;
+    var badge = $('clipBadge');
+    if (!badge) return;
+    var ble = st.ble || {};
+    // 单行状态：左边一句话说结论，右边小标说走哪条通道。
+    // 原来的五条文案（等蓝牙 / 蓝牙等待中… / 已开启）其实在说同一件事，全并了。
+    var txt = '剪贴板自动同步中', chan = '局域网', chanCls = 'on', dotCls = '';
+    if (!st.enabled) {
+      txt = '剪贴板同步未开启';
+      chan = '点此开启'; chanCls = 'off'; dotCls = 'off';
+    } else if (ble.connected) {
+      chan = '蓝牙'; chanCls = 'ble';
+    } else if (!ble.available) {
+      chan = '仅局域网'; chanCls = 'on';
+    }
+    $('clipLine').textContent = txt;
+    $('clipLine').title = (ble.connected && ble.peer) ? ('蓝牙已连 ' + ble.peer) : (ble.error || '');
+    badge.textContent = chan;
+    badge.className = 'clip-chan ' + chanCls;
+    $('clipDot').className = 'clip-dot ' + dotCls;
+
+    var hist = st.history || [];
+    var box = $('clipHist');
+    if (!hist.length) { box.innerHTML = ''; return; }
+    box.innerHTML = hist.map(function (h) {
+      var arrow = h.dir === 'in' ? '↓ 收到' : '↑ 发出';
+      return '<div class="clip-item"><span class="d">' + arrow + ' ' + h.chars + ' 字 · ' +
+        escHtml(h.origin || '') + '</span><br>' + escHtml(h.preview || '') + '</div>';
+    }).join('');
+  }
+
+  function loadClipboard() {
+    return req('/api/clipboard', { cache: 'no-store' }, 6000).then(function (st) {
+      renderClipboard(st);
+      // 剪贴板是刚需，默认自动同步：服务端还没开就主动开一次。
+      // 只在本次页面生命周期里试一次，避免 BLE 不可用时每 5 秒重试一轮。
+      if (st && !st.enabled && !clipAutoTried) {
+        clipAutoTried = true;
+        clipAction('start').catch(function () {});
+      }
+      return st;
+    }).catch(function () { return null; });
+  }
+
+  function clipAction(action) {
+    return req('/api/clipboard', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: action })
+    }, 12000).then(function (st) {
+      renderClipboard(st);
+      return st;
+    });
+  }
+
+  (function () {
+    // 整行可点：展开/收起最近同步过的内容
+    var head = $('clipHead');
+    if (head) {
+      head.addEventListener('click', function () {
+        $('clipCard').classList.toggle('open');
+      });
+    }
+    // 在线设备灰字：点开才展开列表，点外面收起
+    var oWrap = document.querySelector('.online-mini-wrap');
+    var oBtn = $('onlineMini');
+    if (oBtn && oWrap) {
+      oBtn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        oWrap.classList.toggle('open');
+      });
+      document.addEventListener('click', function (e) {
+        if (!oWrap.contains(e.target)) oWrap.classList.remove('open');
+      });
+    }
+    loadClipboard();
+    // 状态比消息刷新慢一点就够，5 秒一次
+    setInterval(function () {
+      if (!document.hidden) loadClipboard();
+    }, 5000);
+  })();
+
+  // ------------------------------------------------------------ 手机 App 原生上传进度
+  // App 的 uploadUri/uploadLocalFile 每次回调都会 evaluateJavascript 调到这。
+  // 只在这一条卡片里显示进度 —— App 侧原来那个盖住整页的原生弹窗已经删掉了。
+  window.JC_UPLOAD_HOOK = function (p) {
+    var box = document.getElementById('nativeProg');
+    if (!box) return;
+    var b = box.querySelector('b'), i = box.querySelector('i');
+    if (p.ev === 'start') {
+      box.style.display = 'block';
+      box.classList.remove('bad');
+      b.textContent = '正在发送「' + p.name + '」';
+      if (i) i.style.width = '0%';
+    } else if (p.ev === 'text') {
+      // 统计 / 打包 / 上传 三阶段的文案都从这来
+      box.style.display = 'block';
+      b.textContent = p.text;
+    } else if (p.ev === 'progress') {
+      if (p.total > 0 && i) i.style.width = (p.done / p.total * 100).toFixed(1) + '%';
+    } else if (p.ev === 'end') {
+      if (p.text) b.textContent = p.text;
+      else b.textContent = p.name + (p.total >= 0 ? ' 已发送' : ' 发送结束');
+      if (i) i.style.width = p.ok === false ? '0%' : '100%';
+      if (p.ok === false) box.classList.add('bad');
+      setTimeout(function () { box.style.display = 'none'; }, p.ok === false ? 2600 : 1600);
+    }
+  };
+
+  // ------------------------------------------------------------ 启动
+  // 地址不缓存：换 WiFi / 插网线 / 开热点后 IP 会变，定期回来问一次服务端
+  var lastUrl = '';
+  // ------------------------------------------------------------ 连接状态灯
+  // 三态：lost=灰静止 / lan=绿呼吸 / wan=蓝呼吸。
+  // 三个信号源谁先到谁生效（系统 offline 事件、消息轮询失败、info 轮询结果），
+  // 统一走 setChan，内部去重 —— 否则每 1.2 秒重复写一次 DOM，白白触发样式重算。
+  var chanState = '';
+  var lastProbe = 0;
+  var netFails = 0;      // 连续失败次数，见 chanFail()
+
+  function setChan(state) {
+    if (state !== 'lost') chanOk();
+    if (state === chanState) return;
+    chanState = state;
+    var d = $('chanDot');
+    if (d) d.className = 'dot' + (state === 'lan' ? ' lan' : (state === 'wan' ? ' wan' : ''));
+    var row = $('chanRow');
+    if (row) row.classList.toggle('lost', state === 'lost');
+    var n = $('chanName');
+    if (n) n.textContent = state === 'wan' ? '公网' : (state === 'lan' ? '局域网' : '未连接');
+    // 左栏那句提示得跟着灯一起走。以前只在 lost 时改，恢复后要靠 /api/info 那次
+    // 10 秒轮询才改回来 —— 中间这段时间「未连接」和「局域网内 · 无需联网」同时挂在
+    // 左栏上，自己打自己脸。
+    var hint = $('netHint');
+    if (hint) {
+      hint.textContent = state === 'lost'
+        ? '与电脑的连接已断开，正在重连…'
+        : (state === 'wan' ? '公网访问中（本机可管理）' : '局域网内 · 无需联网');
+    }
+  }
+
+  /**
+   * 一次请求没成，不等于断开。
+   *
+   * 局域网 WiFi 丢一个包、手机浏览器把标签页挂起、服务端正好在写盘，都会让单次
+   * fetch 超时。以前这里一次失败就 setChan('lost')，下一次轮询成功又 setChan('lan')，
+   * 于是灯在「未连接 / 局域网」之间来回跳 —— 用户看到的就是「网络明明是好的，
+   * 状态却一直在闪」。
+   *
+   * 判定改成「连续两次失败」：中间只要成功过一次就清零（成功的那次会走 chanOk），
+   * 所以偶发的单次超时不会留下任何痕迹。真断线最多晚 1.2 秒变灰。
+   */
+  function chanFail() {
+    netFails += 1;
+    if (netFails >= 2) setChan('lost');
+  }
+
+  /** 任何一次「确认通了」都调这里，把连续失败计数清零 */
+  function chanOk() {
+    netFails = 0;
+  }
+  // 断网恢复的那一刻立刻探一次，别干等 10 秒的 info 轮询
+  function probeNow() {
+    var t = Date.now();
+    if (t - lastProbe < 1500) return;
+    lastProbe = t;
+    refreshInfo();
+  }
+  window.addEventListener('offline', function () { setChan('lost'); });
+  window.addEventListener('online', function () { poll(true); probeNow(); });
+
+  function refreshInfo(notify) {
+    // 加超时：手机浏览器把标签页挂起、或者请求正好撞上服务端写盘时，这个 fetch
+    // 会一直悬着 —— 既不成功也不失败，灯就停在旧状态不动。6 秒没回来当成一次失败。
+    var ctl = null, timer = null, opts = { cache: 'no-store' };
+    if (typeof AbortController !== 'undefined') {
+      ctl = new AbortController();
+      opts.signal = ctl.signal;
+      timer = setTimeout(function () { ctl.abort(); }, 6000);
+    }
+    function done() { if (timer) { clearTimeout(timer); timer = null; } }
+    return fetch('/api/info', opts)
+      .then(function (r) { done(); return r.json(); })
+      .then(function (info) {
+        if (info && info.need_auth) { showLogin(); return info; }
+        var urls = (info.urls && info.urls.length) ? info.urls : [info.url];
+        var next = urls[0] || '';
+        var changed = !!lastUrl && !!next && next !== lastUrl;
+        baseUrl = next;
+        lastUrl = next;
+        lanIps = (info && info.ips) ? info.ips : [];
+
+        // 左栏「扫码连接」卡：地址文字 + 本机生成的二维码（断网也能扫）
+        var sa = $('scanAddr');
+        if (sa) {
+          var shown = next.replace(/^https?:\/\//, '');
+          sa.textContent = shown;
+          // 窄栏里地址一定被省略号截断（224px 放不下 192.168.1.10:8787），
+          // 鼠标悬停给完整地址，别让人为了看个端口去复制粘贴。
+          sa.title = shown + '（点击复制）';
+        }
+        var sq = $('scanQr');
+        if (sq && next && sq.getAttribute('data-for') !== next) {
+          sq.setAttribute('data-for', next);
+          sq.src = '/api/qr?size=180&text=' + encodeURIComponent(next);
+          sq.onerror = function () { qrFail(sq); };
+        }
+        // 多网卡时给一句提示，主地址仍是第一个
+        var qsub = document.querySelector('#scanCard .qsub');
+        if (qsub) {
+          qsub.textContent = urls.length > 1
+            ? ('共 ' + urls.length + ' 个地址，点此复制')
+            : '同一 WiFi 扫码即连';
+          // 多网卡时把全部地址列出来，免得人只能看到第一个
+          qsub.title = urls.length > 1
+            ? urls.map(function (u) { return u.replace(/^https?:\/\//, ''); }).join('\n')
+            : '同一 WiFi 扫码即连';
+        }
+        $('verText').textContent = info.version || '1.0.0';
+        // 独立窗口里标题固定成「简传 Lite」，那个带地址的标题是给浏览器多标签区分的
+        if (!window.pywebview && !document.documentElement.classList.contains('win-app')) {
+          document.title = '简传 Lite · ' + next;
+        }
+        refreshApkInfo(next);
+
+        // 本机/局域网才显示「连接模式」开关和设置按钮；公网访客看不到
+        var isPublic = !!info.tunnel;
+        window.JC_IS_PUBLIC = isPublic;
+        // 服务端判定的「页面是否跑在这台电脑上」：决定文件气泡右侧是打开还是下载。
+        // 老版本服务端没有这个字段，退回 false → 保持下载，最保守。
+        if (typeof info.local === 'boolean') window.JC_LOCAL = info.local;
+        setChan(isPublic ? 'wan' : 'lan');
+        $('modeCard').style.display = isPublic ? 'none' : '';
+        $('settingsBtn').style.display = isPublic ? 'none' : '';
+        // 密码：/api/info 只对本机返回，公网访客拿到的永远是空串
+        var pv = $('pwdVal');
+        if (pv) {
+          pv.textContent = info.password ? info.password : '—';
+          // 密码 15 位，窄栏里一定显示不全，悬停看全量
+          if (info.password) pv.title = info.password + '（点右侧按钮复制）';
+        }
+        $('netHint').textContent = isPublic ? '公网访问中（本机可管理）' : '局域网内 · 无需联网';
+
+        if (changed && notify) toast('网络已切换，地址更新为 ' + next);
+        return info;
+      })
+      .catch(function () {
+        // 连不上电脑（服务关了 / 电脑休眠 / 手机断网）→ 记一次失败，连续两次才点灰。
+        done();
+        chanFail();
+      });
+  }
+
+  // ------------------------------------------------------------ 公网开关 / 设置
+  var tunnelPoll = null;
+
+  /**
+   * 连接模式卡片的三态切换。
+   * 标题**恒定**是「公网访问」——这张卡的开关只控制公网隧道，局域网一直开着。
+   * 以前标题随状态换（局域网直连 / 公网已开启 / 正在建立隧道…），
+   * 关着时读成「局域网直连 · 已关闭」，等于说局域网被关了，跟事实相反；
+   * 而且「局域网直连」5 个字 + 胶囊在 208px 左栏里会顶爆开关。
+   * 现在：标题=是什么，胶囊=开没开，副标题=能怎么连。
+   */
+  function setModeUI(state, url) {
+    var card = $('modeCard');
+    if (!card) return;
+    card.classList.remove('pub', 'busy');
+    var t = $('modeTitle'), s = $('modeSub'), b = $('modeBadge');
+    t.textContent = '公网访问';
+    t.title = '打开后外面的人也能连（需要密码）';
+    if (state === 'pub') {
+      card.classList.add('pub');
+      s.textContent = '外面的人凭密码也能连';
+      if (b) b.textContent = '已开启';
+    } else if (state === 'starting') {
+      card.classList.add('busy');
+      s.textContent = '正在建立隧道…';
+      if (b) b.textContent = '连接中';
+    } else if (state === 'stopping') {
+      card.classList.add('busy');
+      s.textContent = '正在断开公网…';
+      if (b) b.textContent = '关闭中';
+    } else {
+      // 副标题要说的是**这个开关能干什么**（公网），不是复述局域网的现状。
+      // 写「只在同一 WiFi 能连」是在介绍另一件事，和标题「公网访问」对不上。
+      s.textContent = '打开后外网也能连';
+      if (b) b.textContent = '已关闭';
+    }
+    if (url) $('pubUrl').textContent = url;
+  }
+
+  function updateTunnelUI(t) {
+    if (!t) return;
+    $('tunnelSwitch').checked = !!t.running;
+    if (t.running) {
+      if (t.url) {
+        setModeUI('pub', t.url);
+        stopPollTunnel();
+      } else {
+        setModeUI('starting');
+        if (!tunnelPoll) startPollTunnel();
+      }
+    } else {
+      setModeUI('lan');
+      stopPollTunnel();
+    }
+  }
+
+  function pollTunnel() {
+    fetch('/api/tunnel', { cache: 'no-store' }).then(function (r) { return r.json(); }).then(function (t) {
+      if (t && t.url) {
+        setModeUI('pub', t.url);
+        stopPollTunnel();
+      }
+      if (t && !t.running) updateTunnelUI({ running: false });
+    }).catch(function () {});
+  }
+  function startPollTunnel() { stopPollTunnel(); tunnelPoll = setInterval(pollTunnel, 2000); }
+  function stopPollTunnel() { if (tunnelPoll) { clearInterval(tunnelPoll); tunnelPoll = null; } }
+
+  function loadSettings() {
+    return fetch('/api/settings', { cache: 'no-store' }).then(function (r) {
+      if (r.status === 403 || r.status === 401) return null;
+      return r.json();
+    }).then(function (s) {
+      if (!s) return;
+      $('setPwd').value = s.password || '';
+      $('setServer').value = s.self_server || '';
+      updateTunnelUI(s.tunnel || {});
+    }).catch(function () {});
+  }
+
+  $('tunnelSwitch').addEventListener('change', function () {
+    var want = this.checked;
+    var act = want ? '/api/tunnel/start' : '/api/tunnel/stop';
+    this.disabled = true;
+    setModeUI(want ? 'starting' : 'stopping');
+    fetch(act, { method: 'POST' }).then(function (r) { return r.json(); }).then(function (d) {
+      if (d && d.ok) {
+        if (want) {
+          if (d.url) setModeUI('pub', d.url);
+          else { setModeUI('starting'); startPollTunnel(); }
+        } else {
+          updateTunnelUI({ running: false });
+        }
+        toast(want ? '公网已开启' : '公网已关闭');
+      } else {
+        toast((d && d.error) || '操作失败');
+        $('tunnelSwitch').checked = !want;
+        setModeUI(!want ? 'pub' : 'lan');
+      }
+    }).catch(function () {
+      toast('操作失败');
+      $('tunnelSwitch').checked = !want;
+      setModeUI(!want ? 'pub' : 'lan');
+    }).then(function () { $('tunnelSwitch').disabled = false; });
+  });
+
+  // 整张卡可点：开关那个小圆点太难点，点到卡片任何地方都算
+  $('modeCard').addEventListener('click', function (e) {
+    if (e.target.closest('.switch')) return;        // 开关自己会处理
+    if (e.target.closest('#pubCopy')) return;       // 复制按钮别触发切换
+    if (e.target.closest('.mode-pwd')) return;      // 密码那行整块都不算"拨开关"
+    if ($('tunnelSwitch').disabled) return;         // 正在切换中，忽略
+    var cb = $('tunnelSwitch');
+    cb.checked = !cb.checked;
+    cb.dispatchEvent(new Event('change'));
+  });
+
+  $('pubCopy').addEventListener('click', function () {
+    var u = $('pubUrl').textContent;
+    if (u && u.indexOf('trycloudflare') >= 0) {
+      copyText(u).then(function (ok) { toast(ok ? '公网地址已复制' : '复制失败'); });
+    } else {
+      toast('隧道还在建立，稍等');
+    }
+  });
+
+  // 公网密码以前只打在黑框控制台上，exe 隐藏控制台后就没处看了，挪到卡片里
+  $('pwdCopy').addEventListener('click', function () {
+    var p = $('pwdVal').textContent;
+    if (p && p !== '—') {
+      copyText(p).then(function (ok) { toast(ok ? ('密码已复制：' + p) : '复制失败'); });
+    } else {
+      toast('没读到密码，稍后再试');
+    }
+  });
+
+  $('settingsBtn').addEventListener('click', function () { $('settingsModal').classList.add('on'); });
+  $('setSave').addEventListener('click', function () {
+    var body = {
+      password: $('setPwd').value.trim(),
+      self_server: $('setServer').value.trim()
+    };
+    fetch('/api/settings', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    }).then(function (r) { return r.json(); }).then(function (d) {
+      if (d && d.ok) {
+        toast(body.password ? ('已保存，新密码：' + body.password) : '已保存');
+        // 卡片里那行密码跟着更新，否则改完还显示旧的，复制出去是错的
+        var pv = $('pwdVal');
+        if (pv && body.password) pv.textContent = body.password;
+        $('settingsModal').classList.remove('on');
+      } else {
+        toast((d && d.error) || '保存失败');
+      }
+    }).catch(function () { toast('保存失败'); });
+  });
+
+  // 正常进入后的初始化
+  function startApp() {
+    // 手机 App 里：把本端的 client id 同步给原生，上传时用同一个 id，
+    // 这样 App 上传的文件能被正确识别成「自己发的」，不会被自动下载回来
+    if (window.AndroidBridge && window.AndroidBridge.setClientId) {
+      try { window.AndroidBridge.setClientId(CID); } catch (e) {}
+    }
+    refreshInfo(false);
+    loadSettings();
+    // 页面焦点心跳：电脑端正盯着列表时，手机传完只把卡片落进列表，不再弹系统通知。
+    // 5 秒一次是为了喂服务端那个 15 秒 TTL（页面崩了/关掉后通知要能自己恢复）。
+    // App 内页面跳过 —— 那边不是电脑本机，服务端也只认 127.0.0.1。
+    if (!window.AndroidBridge) {
+      var pushFocus = function () {
+        // 公网访客的页面也跑这段 JS，但心跳对他没意义（还每 5 秒白走一次隧道）
+        if (window.JC_IS_PUBLIC) return;
+        fetch('/api/focus', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ focused: !document.hidden && document.hasFocus() })
+        }).catch(function () {});
+      };
+      pushFocus();
+      setInterval(pushFocus, 5000);
+      ['focus', 'blur', 'visibilitychange'].forEach(function (ev) {
+        window.addEventListener(ev, pushFocus);
+      });
+    }
+    setInterval(function () { if (!document.hidden) refreshInfo(true); }, 10000);
+    poll(true).then(function () { autoGrow(); input.focus(); });
+    // 轮询不设 visibility 门槛：手机 WebView 里 document.hidden 偶发误判为 true，
+    // 会导致消息永久收不到（表现为「电脑发、手机收不到」的单向问题）
+    setInterval(function () {
+      poll(false);
+    }, 1200);
+  }
+
+  // 登录
+  function showLogin(msg) {
+    $('loginMask').classList.add('on');
+    if (msg) $('loginErr').textContent = msg;
+    setTimeout(function () { var i = $('loginPwd'); if (i) i.focus(); }, 100);
+  }
+  function doLogin() {
+    var pwd = $('loginPwd').value;
+    if (!pwd) { $('loginErr').textContent = '请输入密码'; return; }
+    $('loginBtn').disabled = true;
+    fetch('/api/auth', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password: pwd })
+    }).then(function (r) {
+      return r.json().then(function (d) { return { ok: r.ok, d: d }; });
+    }).then(function (res) {
+      if (res.ok) { location.reload(); }
+      else {
+        $('loginErr').textContent = (res.d && res.d.error) || '密码错误';
+        $('loginPwd').value = '';
+        $('loginPwd').focus();
+        $('loginBtn').disabled = false;
+      }
+    }).catch(function () {
+      $('loginErr').textContent = '网络异常，稍后再试';
+      $('loginBtn').disabled = false;
+    });
+  }
+  $('loginBtn').addEventListener('click', doLogin);
+  $('loginPwd').addEventListener('keydown', function (e) { if (e.key === 'Enter') doLogin(); });
+
+  // 先探测是否已登录
+  fetch('/api/info', { cache: 'no-store' }).then(function (r) {
+    if (r.status === 401) { showLogin(); }
+    else { startApp(); }
+  }).catch(function () { showLogin('连接不上服务'); });
+
+  document.addEventListener('visibilitychange', function () {
+    if (!document.hidden) { poll(false); refreshInfo(true); }
+  });
+})();
+</script>
+</body>
+</html>

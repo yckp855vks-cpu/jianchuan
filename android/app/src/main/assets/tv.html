@@ -1,0 +1,1016 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>简传 · 电视</title>
+<style>
+  /* 这个页面跑在投影仪的 WebView 里，内核只有 Chrome 66（2018 年）。
+     所以：不用 aspect-ratio、不用 :is()、不用 gap（flex 版）、不用 inset、
+     不用 ?. 和 ??。下面每一处都是照着 66 的能力写的，改的时候别用新语法。 */
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  html, body { height: 100%; overflow: hidden; }
+  body {
+    background: #0b1016;
+    color: #e6eef7;
+    font-family: -apple-system, "Noto Sans SC", "Source Han Sans SC", "Microsoft YaHei", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    display: flex;
+    flex-direction: column;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* ---------- 顶栏 ---------- */
+  header {
+    flex: none; height: 8.4vw;
+    display: flex; align-items: center;
+    padding: 0 2.2vw;
+    border-bottom: 1px solid rgba(255,255,255,.05);
+  }
+  .brand { display: flex; align-items: center; flex: none; }
+  .brand .logo {
+    width: 2.1vw; height: 2.1vw; border-radius: .6vw; flex: none;
+    background: linear-gradient(135deg, #5cb4ee, #2f7fb8);
+    position: relative;
+  }
+  .brand .logo::after {
+    content: ""; position: absolute; left: 36%; top: 30%;
+    width: 0; height: 0;
+    border-left: .62vw solid #08141d;
+    border-top: .38vw solid transparent;
+    border-bottom: .38vw solid transparent;
+  }
+  .brand b { font-size: 3vw; font-weight: 600; margin-left: .7vw; letter-spacing: .04em; }
+  .brand .sub { font-size: 1.55vw; color: #7a8ea1; margin-left: .6vw; letter-spacing: .08em; }
+
+  #tabs { display: flex; align-items: center; margin-left: 3vw; flex: none; }
+  .tab {
+    padding: 1.35vw 1.75vw; border-radius: 999px;
+    font-size: 2.25vw; color: #93a3b4;
+    background: rgba(255,255,255,.045);
+    margin-right: .55vw;
+    border: .12vw solid transparent;
+    transition: background .16s, color .16s, border-color .16s, transform .16s;
+  }
+  .tab.on { color: #06121b; background: #4fa8e8; font-weight: 600; }
+  .tab.focus { border-color: #bcdcf5; transform: scale(1.06); }
+
+  .topright { margin-left: auto; display: flex; align-items: center; flex: none; }
+  #dot { width: .55vw; height: .55vw; border-radius: 50%; background: #3ecf8e; margin-right: .5vw; }
+  #dot.off { background: #d8544a; }
+  #time { font-size: 1.55vw; color: #8b9eb0; font-variant-numeric: tabular-nums; }
+
+  /* ---------- 内容区 ---------- */
+  #main { flex: 1; overflow-y: auto; overflow-x: hidden; padding: 1.6vw 2.2vw 0; }
+  #main::-webkit-scrollbar { width: .45vw; }
+  #main::-webkit-scrollbar-thumb { background: rgba(255,255,255,.13); border-radius: 999px; }
+  #main::-webkit-scrollbar-track { background: transparent; }
+
+  .rowTitle {
+    font-size: 1.7vw; color: #8496a8; letter-spacing: .14em;
+    margin: 0 0 .85vw .1vw;
+  }
+  #contRow { margin-bottom: 1.9vw; }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);   /* 必须和 JS 里的 COLS 一致，否则遥控器对不上位 */
+    grid-column-gap: 1.4vw;
+    grid-row-gap: 1.7vw;
+  }
+
+  /* ---------- 卡片 ---------- */
+  .card { position: relative; }
+  .card .shot {
+    position: relative; width: 100%; padding-top: 56.25%;
+    border-radius: .7vw; overflow: hidden;
+    background: #161f2a;
+    border: .12vw solid rgba(255,255,255,.07);
+    transition: transform .18s ease-out, border-color .18s, box-shadow .18s;
+  }
+  .card .ph {
+    position: absolute; left: 0; top: 0; width: 100%; height: 100%;
+    background: linear-gradient(135deg, #1b2733, #121a23);
+  }
+  .card .ph::after {
+    content: ""; position: absolute; left: 50%; top: 50%;
+    margin-left: -.55vw; margin-top: -.8vw;
+    width: 0; height: 0;
+    border-left: 1.1vw solid rgba(255,255,255,.14);
+    border-top: .8vw solid transparent;
+    border-bottom: .8vw solid transparent;
+  }
+  .card .img {
+    position: absolute; left: 0; top: 0; width: 100%; height: 100%;
+    background-size: cover; background-position: center;
+    opacity: 0; transition: opacity .3s;
+  }
+  .card .img.on { opacity: 1; }
+  .card.focus .shot {
+    border-color: #4fa8e8;
+    transform: scale(1.055);
+    box-shadow: 0 0 0 .09vw rgba(79,168,232,.55), 0 1.1vw 2.2vw rgba(0,0,0,.55);
+    z-index: 4;
+  }
+  .card .badge {
+    position: absolute; padding: .22vw .62vw; border-radius: .3vw;
+    font-size: 1.55vw; line-height: 1.35;
+    background: rgba(5,11,17,.8); color: #d7e6f4;
+    white-space: nowrap;
+  }
+  .card .badge.tl { left: .5vw; top: .5vw; }
+  .card .badge.tr { right: .5vw; top: .5vw; }
+  .card .badge.bl { left: .5vw; bottom: .5vw; }
+  .card .badge.pin { background: rgba(79,168,232,.94); color: #05121b; font-weight: 600; }
+  .card .badge.blue { background: rgba(79,168,232,.94); color: #05121b; font-weight: 600; }
+  .card .badge.dim { color: #7f8fa0; }
+  .card .pbar {
+    position: absolute; left: 0; right: 0; bottom: 0; height: .2vw;
+    background: rgba(255,255,255,.14);
+  }
+  .card .pbar i { display: block; height: 100%; background: #4fa8e8; }
+
+  .card .meta { padding: .7vw .05vw 0; }
+  .card .fname {
+    font-size: 2.12vw; color: #edf4fb; line-height: 1.26;
+    display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2;
+    overflow: hidden; white-space: normal;
+    max-height: 2.6em;
+  }
+  .card.focus .fname { color: #ffffff; }
+  .card .fsub {
+    font-size: 1.5vw; color: #93a6ba; margin-top: .26vw; line-height: 1.3;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  /* 置顶过的卡片描边高亮，一眼看出它在最前面 */
+  .card.pinned .shot { border-color: rgba(79,168,232,.55); }
+
+  /* ---------- 空态 / 错误 ---------- */
+  .empty {
+    padding: 6vw 0; text-align: center; color: #93a6b8; font-size: 1.85vw;
+  }
+  .empty b { display: block; color: #bccbdb; font-size: 2.5vw; margin-bottom: .9vw; font-weight: 500; }
+  .empty em { font-style: normal; font-size: 1.85vw; line-height: 1.8; }
+
+  /* ---------- 选集页 ---------- */
+  .showHead { display: flex; align-items: baseline; margin-bottom: 1.3vw; }
+  .back {
+    flex: none; font-size: 1.7vw; color: #a9bacb;
+    padding: .7vw 1.5vw; border-radius: 999px;
+    background: rgba(255,255,255,.055);
+    border: .12vw solid transparent;
+    margin-right: 1.4vw;
+    transition: background .16s, color .16s, border-color .16s;
+  }
+  .back.focus { border-color: #4fa8e8; color: #d7ecff; background: rgba(79,168,232,.16); }
+  .showHead h2 { font-size: 3vw; font-weight: 600; letter-spacing: .01em; }
+  .showHead .sub { font-size: 1.62vw; color: #93a6b8; margin-left: 1.1vw; }
+
+  .epGrid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    grid-column-gap: .85vw;
+    grid-row-gap: .85vw;
+  }
+  .ep {
+    position: relative; text-align: center;
+    padding: 1vw .4vw .85vw;
+    border-radius: .6vw; background: #121a24;
+    border: .12vw solid transparent;
+    transition: transform .16s, background .16s, border-color .16s;
+  }
+  .ep .no { font-size: 2.75vw; color: #dce7f2; font-weight: 500; line-height: 1.1; }
+  .ep .tl {
+    font-size: 1.42vw; color: #90a3b5; margin-top: .38vw;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .ep.done { opacity: .45; }
+  .ep.done .no { text-decoration: none; }
+  .ep.done::after {
+    content: "✓"; position: absolute; right: .4vw; top: .25vw;
+    font-size: .74vw; color: #4fa8e8;
+  }
+  .ep.cur { background: #16283a; }
+  .ep.cur .no { color: #5cb4ee; }
+  .ep.cur .tl { color: #7fa6c6; }
+  .ep.focus {
+    border-color: #4fa8e8; transform: scale(1.05);
+    background: #1b2c3f;
+    box-shadow: 0 0 0 .08vw rgba(79,168,232,.4), 0 .7vw 1.4vw rgba(0,0,0,.45);
+    z-index: 3;
+  }
+
+  /* ---------- 底部详情条 ---------- */
+  footer {
+    flex: none; height: 6vw;
+    display: flex; align-items: center;
+    padding: 0 2.2vw;
+    border-top: 1px solid rgba(255,255,255,.06);
+    background: rgba(9,14,20,.8);
+  }
+  #detName {
+    font-size: 1.85vw; color: #e3edf7; max-width: 34vw;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  #detMeta { font-size: 1.5vw; color: #8b9fb2; margin-left: 1vw; flex: 1; overflow: hidden; white-space: nowrap; }
+  .hint { flex: none; font-size: 1.35vw; color: #6b7d90; letter-spacing: .04em; }
+  .hint b { color: #9aadc0; font-weight: 500; }
+
+  /* 顶部小提示（置顶成功之类） */
+  .toast {
+    position: fixed; left: 50%; bottom: 6.6vw; z-index: 99;
+    margin-left: -11vw; width: 22vw; text-align: center;
+    background: rgba(79,168,232,.96); color: #06121b;
+    font-size: 1.7vw; font-weight: 600;
+    padding: .75vw 0; border-radius: 999px;
+    opacity: 0; transition: opacity .2s;
+    pointer-events: none;
+  }
+  .toast.on { opacity: 1; }
+
+  /* 置顶：底栏上的一个可聚焦按钮，遥控器从卡片网格按「下」就能到 */
+  #btnPin {
+    flex: none; margin-left: 1.2vw; margin-right: 1.2vw;
+    font-size: 1.65vw; color: #d7e6f4;
+    padding: .62vw 1.4vw; border-radius: 999px;
+    background: rgba(255,255,255,.08);
+    border: .12vw solid rgba(255,255,255,.12);
+    transition: background .16s, color .16s, border-color .16s, transform .16s;
+  }
+  #btnPin.focus {
+    background: #4fa8e8; color: #06121b; font-weight: 600;
+    border-color: #bcdcf5; transform: scale(1.05);
+  }
+  #btnPin[hidden] { display: none; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <i class="logo"></i>
+    <b>简传</b>
+    <span class="sub">电视版</span>
+  </div>
+  <nav id="tabs">
+    <a class="tab on" data-tab="all">全部</a>
+    <a class="tab" data-tab="shows">剧集</a>
+    <a class="tab" data-tab="singles">影片</a>
+    <a class="tab" data-tab="refresh">↻ 刷新</a>
+  </nav>
+  <div class="topright">
+    <i id="dot"></i>
+    <span id="time">--:--</span>
+  </div>
+</header>
+
+<div id="main">
+  <div id="vHome">
+    <div id="contRow" hidden>
+      <div class="rowTitle">继续观看</div>
+      <div class="grid" id="contGrid"></div>
+    </div>
+    <div id="listRow">
+      <div class="rowTitle" id="listTitle">全部</div>
+      <div class="grid" id="grid"></div>
+      <div class="empty" id="emptyState" hidden></div>
+    </div>
+  </div>
+
+  <div id="vShow" hidden>
+    <div class="showHead">
+      <a class="back" id="btnBack">‹ 返回</a>
+      <h2 id="showName"></h2>
+      <span class="sub" id="showSub"></span>
+    </div>
+    <div class="epGrid" id="epGrid"></div>
+  </div>
+</div>
+
+<footer>
+  <div id="detName">正在读取…</div>
+  <div id="detMeta"></div>
+  <a id="btnPin" hidden>★ 置顶</a>
+  <div class="hint"><b>方向键</b> 选择 · <b>OK</b> 播放 · <b>返回</b> 上一级</div>
+</footer>
+
+<script>
+(function () {
+  'use strict';
+
+  var COLS = 3;        // 首页三列：100 寸屏每张卡够宽，文件名能看清（原来四列字太小）
+  var EP_COLS = 6;     // 选集页放得密一些，一屏能看三十集
+  var data = { shows: [], singles: [] };
+  var tab = 'all';
+  var view = 'home';
+  var sections = [];   // [{nodes:[], cols:N, kind:'tab'|'card'|'ep'|'back'|'pin'}]
+  var si = 0, r = 0, c = 0;
+  var loaded = false;
+  var pins = [];       // 置顶的片子名（顺序即置顶顺序）
+  var lastCard = null; // 焦点最后停留过的那张卡，置顶按钮作用在它身上
+  var pinBtn = null;
+  var lastLoadTs = 0;
+
+  function $(id) { return document.getElementById(id); }
+  function el(tag, cls) { var d = document.createElement(tag); if (cls) { d.className = cls; } return d; }
+
+  // ---------------- 缩略图：限并发 + 只加载真正可见的 ----------------
+  //
+  // 同 origin 的浏览器只有 6 条 HTTP/1.1 连接。电视上一次铺几十张 /thumb
+  // 会把这些连接占死，连 /api/tv 都得排队，表现就是"满屏白块、点什么都没反应"。
+  // 所以：并发上限 3，且只给进入可视区的卡片补图。
+  var thumbQ = [], thumbLive = 0, THUMB_MAX = 3;
+
+  function wantThumb(node, path) {
+    thumbQ.push({ node: node, path: path });
+    pump();
+  }
+  function pump() {
+    while (thumbLive < THUMB_MAX && thumbQ.length) {
+      var job = thumbQ.shift();
+      thumbLive++;
+      loadThumb(job);
+    }
+  }
+  function loadThumb(job) {
+    var img = new Image();
+    var timer = setTimeout(function () { img.src = ''; thumbLive--; pump(); }, 15000);
+    img.onload = function () {
+      clearTimeout(timer);
+      if (job.node && job.node.parentNode) {
+        job.node.style.backgroundImage = 'url("' + img.src + '")';
+        job.node.className = 'img on';
+      }
+      thumbLive--; pump();
+    };
+    img.onerror = function () {
+      clearTimeout(timer);
+      thumbLive--; pump();
+    };
+    img.src = '/thumb?path=' + encodeURIComponent(job.path);
+  }
+
+  var io = null;
+  function lazyThumb(node, path) {
+    if (!path) { return; }
+    if (!('IntersectionObserver' in window)) { wantThumb(node, path); return; }
+    if (!io) {
+      io = new IntersectionObserver(function (entries) {
+        for (var i = 0; i < entries.length; i++) {
+          var e = entries[i];
+          if (e.isIntersecting) {
+            io.unobserve(e.target);
+            wantThumb(e.target, e.target.getAttribute('data-thumb'));
+          }
+        }
+      }, { root: $('main'), rootMargin: '300px' });
+    }
+    node.setAttribute('data-thumb', path);
+    io.observe(node);
+  }
+
+  // ---------------- 工具 ----------------
+  var toastEl = null, toastTimer = null;
+  function toast(msg) {
+    if (!toastEl) { toastEl = el('div', 'toast'); document.body.appendChild(toastEl); }
+    toastEl.textContent = msg;
+    toastEl.className = 'toast on';
+    if (toastTimer) { clearTimeout(toastTimer); }
+    toastTimer = setTimeout(function () { toastEl.className = 'toast'; }, 1600);
+  }
+
+  function fmtT(sec) {
+    if (!sec || sec <= 0) { return ''; }
+    sec = Math.floor(sec);
+    var h = Math.floor(sec / 3600), m = Math.floor((sec % 3600) / 60);
+    if (h > 0) { return h + ':' + (m < 10 ? '0' : '') + m + ':' + ((sec % 60) < 10 ? '0' : '') + (sec % 60); }
+    return m + ':' + ((sec % 60) < 10 ? '0' : '') + (sec % 60);
+  }
+
+  function groupPct(g) {
+    if (g.count > 1) {
+      var watched = g.watched || 0;
+      var extra = (g.curIdx >= 0) ? (g.curPct || 0) : 0;
+      return Math.min(1, (watched + extra) / g.count);
+    }
+    var e = g.eps && g.eps[0];
+    return e ? (e.pct || 0) : 0;
+  }
+
+  function subText(g, ep) {
+    if (ep) {
+      var s = ep.title || ep.name || '';
+      if (ep.dur > 0 && ep.pos > 5) { s = s + ' · 上次 ' + fmtT(ep.pos) + ' / ' + fmtT(ep.dur); }
+      return s;
+    }
+    if (g.count > 1) {
+      var t = g.count + ' 集';
+      if (g.watched >= g.count) { return t + ' · 已全部看完'; }
+      if (g.curNo > 0) { return t + ' · 看到第 ' + g.curNo + ' 集'; }
+      if (g.watched > 0) { return t + ' · 已看 ' + g.watched + ' 集'; }
+      return t + ' · 还没开始看';
+    }
+    var e0 = g.eps && g.eps[0];
+    if (!e0) { return ''; }
+    var s2 = e0.size_text || '';
+    if (e0.pos > 5) { s2 = s2 + ' · 上次 ' + fmtT(e0.pos); }
+    return s2;
+  }
+
+  // ---------------- 置顶 ----------------
+  //
+  // 存在投影仪壳的 SharedPreferences 里（TVBridge.getPins/setPins），不是 localStorage：
+  // localStorage 认 origin，手机换个 IP 就全丢；壳里的键跟地址无关。
+  // 没有壳（浏览器直接开 /tv）时退回 localStorage。
+  function loadPins() {
+    var raw = '';
+    try {
+      if (window.TVBridge && window.TVBridge.getPins) { raw = window.TVBridge.getPins() || ''; }
+    } catch (e) {}
+    if (!raw) { try { raw = window.localStorage.getItem('jc_pins') || ''; } catch (e2) {} }
+    var out = [];
+    try {
+      var a = JSON.parse(raw);
+      if (a && a.length) {
+        for (var i = 0; i < a.length; i++) {
+          if (typeof a[i] === 'string' && a[i]) { out.push(a[i]); }
+        }
+      }
+    } catch (e3) {}
+    return out;
+  }
+
+  function savePins() {
+    var s = JSON.stringify(pins);
+    try {
+      if (window.TVBridge && window.TVBridge.setPins) { window.TVBridge.setPins(s); }
+    } catch (e) {}
+    try { window.localStorage.setItem('jc_pins', s); } catch (e2) {}
+  }
+
+  function pinKey(g) { return (g && g.name) ? ('' + g.name) : ''; }
+  function isPinned(g) { var k = pinKey(g); return !!k && pins.indexOf(k) >= 0; }
+
+  /** 置顶的排最前面，其余保持服务端原有顺序 */
+  function sortPinned(arr) {
+    if (!pins.length || !arr.length) { return arr; }
+    var top = [], rest = [];
+    for (var i = 0; i < arr.length; i++) {
+      if (isPinned(arr[i])) { top.push(arr[i]); } else { rest.push(arr[i]); }
+    }
+    top.sort(function (a, b) { return pins.indexOf(pinKey(a)) - pins.indexOf(pinKey(b)); });
+    return top.concat(rest);
+  }
+
+  function togglePin(g, keepInRow) {
+    var k = pinKey(g);
+    if (!k) { return; }
+    var i = pins.indexOf(k);
+    if (i >= 0) { pins.splice(i, 1); toast('已取消置顶：' + k); }
+    else { pins.unshift(k); toast('已置顶：' + k); }
+    savePins();
+    renderHome(false);
+    if (keepInRow) {
+      for (var s = 0; s < sections.length; s++) {
+        if (sections[s].kind === 'pin') { si = s; r = 0; c = 0; paint(); break; }
+      }
+    }
+  }
+
+  // ---------------- 首页渲染 ----------------
+  function continueItems() {
+    var all = (data.shows || []).concat(data.singles || []);
+    var out = [];
+    for (var i = 0; i < all.length; i++) {
+      var g = all[i];
+      if (g.curIdx >= 0 && g.eps && g.eps[g.curIdx]) {
+        out.push({ g: g, ep: g.eps[g.curIdx], ts: g.ts || 0 });
+      }
+    }
+    out.sort(function (a, b) { return b.ts - a.ts; });
+    return out.slice(0, 6);
+  }
+
+  function makeCard(g, ep) {
+    var card = el('div', isPinned(g) ? 'card pinned' : 'card');
+    card.__group = g;
+    card.__ep = ep || null;
+
+    var shot = el('div', 'shot');
+    shot.appendChild(el('div', 'ph'));
+    var img = el('div', 'img');
+    shot.appendChild(img);
+    if (g.cover) { lazyThumb(img, g.cover); }
+
+    var bl = el('div', 'badge tl');
+    if (g.count > 1) {
+      bl.textContent = g.count + ' 集';
+    } else {
+      bl.textContent = (g.eps && g.eps[0] && g.eps[0].size_text) ? g.eps[0].size_text : '影片';
+    }
+    shot.appendChild(bl);
+
+    if (isPinned(g)) {
+      var bp = el('div', 'badge bl pin');
+      bp.textContent = '★ 置顶';
+      shot.appendChild(bp);
+    }
+
+    if (ep) {
+      var bb = el('div', 'badge tr blue');
+      bb.textContent = '继续 · ' + (ep.no > 0 ? ('第 ' + ep.no + ' 集') : '上次');
+      shot.appendChild(bb);
+    } else if (g.count > 1) {
+      var br = el('div', 'badge tr');
+      if (g.watched >= g.count) {
+        br.className = 'badge tr dim';
+        br.textContent = '已看完';
+      } else if (g.curNo > 0) {
+        br.textContent = '看到第 ' + g.curNo + ' 集';
+      } else {
+        br.textContent = '未看';
+      }
+      shot.appendChild(br);
+    }
+
+    var pct = ep ? (ep.pct || 0) : groupPct(g);
+    if (pct > 0.01) {
+      var pb = el('div', 'pbar');
+      var pi = el('i');
+      var w = Math.round(Math.min(1, pct) * 100);
+      pi.style.width = (w < 2 ? 2 : w) + '%';
+      pb.appendChild(pi);
+      shot.appendChild(pb);
+    }
+    card.appendChild(shot);
+
+    var meta = el('div', 'meta');
+    var fn = el('div', 'fname');
+    fn.textContent = g.name || '未命名';
+    var fs = el('div', 'fsub');
+    fs.textContent = subText(g, ep);
+    meta.appendChild(fn);
+    meta.appendChild(fs);
+    card.appendChild(meta);
+    return card;
+  }
+
+  function setEmpty(msg, sub) {
+    var e = $('emptyState');
+    if (!msg) { e.hidden = true; return; }
+    e.hidden = false;
+    e.innerHTML = '<b>' + msg + '</b><em>' + (sub || '') + '</em>';
+  }
+
+  function paintPinBtn() {
+    if (!pinBtn) { return; }
+    var g = lastCard;
+    if (!g) { pinBtn.textContent = '★ 置顶'; return; }
+    pinBtn.textContent = isPinned(g) ? '★ 取消置顶' : '★ 置顶';
+  }
+
+  function renderHome(fromTab) {
+    view = 'home';
+    $('vShow').hidden = true;
+    $('vHome').hidden = false;
+    sections = [];
+
+    var tabs = $('tabs').children;
+    var tabNodes = [];
+    var tabIdx = 0;
+    for (var i = 0; i < tabs.length; i++) {
+      var t = tabs[i];
+      var on = t.getAttribute('data-tab') === tab;
+      if (on) { tabIdx = i; }
+      t.className = 'tab' + (on ? ' on' : '');
+      tabNodes.push(t);
+    }
+    sections.push({ nodes: tabNodes, cols: tabNodes.length, kind: 'tab' });
+
+    var cont = continueItems();
+    var contGrid = $('contGrid');
+    contGrid.innerHTML = '';
+    $('contRow').hidden = !cont.length;
+    if (cont.length) {
+      var cn = [];
+      for (var j = 0; j < cont.length; j++) {
+        var cc = makeCard(cont[j].g, cont[j].ep);
+        contGrid.appendChild(cc);
+        cn.push(cc);
+      }
+      sections.push({ nodes: cn, cols: COLS, kind: 'card' });
+    }
+
+    var list = [];
+    if (tab !== 'singles') { list = list.concat(sortPinned(data.shows || [])); }
+    if (tab !== 'shows') { list = list.concat(sortPinned(data.singles || [])); }
+
+    var grid = $('grid');
+    grid.innerHTML = '';
+    var gn = [];
+    for (var k = 0; k < list.length; k++) {
+      var card = makeCard(list[k], null);
+      grid.appendChild(card);
+      gn.push(card);
+    }
+    sections.push({ nodes: gn, cols: COLS, kind: 'card' });
+    var gridIdx = sections.length - 1;
+
+    // 置顶按钮挂在底栏，作为最后一个可聚焦区：网格按「下」就到
+    pinBtn = $('btnPin');
+    pinBtn.hidden = !gn.length;
+    paintPinBtn();
+    if (gn.length) { sections.push({ nodes: [pinBtn], cols: 1, kind: 'pin' }); }
+
+    $('listTitle').textContent = tab === 'shows' ? '剧集' : (tab === 'singles' ? '影片与散片' : '全部影片');
+
+    if (!loaded) {
+      setEmpty('正在读取手机上的文件…', '');
+    } else if (!gn.length && !cont.length) {
+      setEmpty('这里还没有视频',
+        '用简传把片子传到手机，或手机相册里已有视频<br>回到手机点一次「重新扫描」，这里就有了');
+    } else {
+      setEmpty('', '');
+    }
+
+    if (fromTab) {
+      si = 0; r = 0; c = tabIdx;
+    } else if (cont.length) {
+      si = 1; r = 0; c = 0;          // 打开电视最想干的事是接着看，焦点先给「继续观看」
+    } else {
+      si = gridIdx; r = 0; c = 0;    // 没有继续观看就直接进片单（不能落到最后的置顶按钮上）
+    }
+    paint();
+  }
+
+  // ---------------- 选集页 ----------------
+  function renderShow(g, focusIdx) {
+    view = 'show';
+    $('vHome').hidden = true;
+    $('vShow').hidden = false;
+    $('showName').textContent = g.name || '未命名';
+    var sub = '共 ' + g.count + ' 集';
+    if (g.watched > 0) { sub = sub + ' · 已看 ' + g.watched + ' 集'; }
+    $('showSub').textContent = sub;
+
+    sections = [];
+    var back = $('btnBack');
+    back.className = 'back';
+    sections.push({ nodes: [back], cols: 1, kind: 'back' });
+
+    var eg = $('epGrid');
+    eg.innerHTML = '';
+    var nodes = [];
+    for (var i = 0; i < g.eps.length; i++) {
+      var ep = g.eps[i];
+      var d = el('div', 'ep');
+      if (ep.done) { d.className += ' done'; }
+      else if (ep.pos > 5) { d.className += ' cur'; }
+      var no = el('div', 'no');
+      no.textContent = ep.no > 0 ? ep.no : (i + 1);
+      var tl = el('div', 'tl');
+      if (ep.done) { tl.textContent = '已看完'; }
+      else if (ep.pos > 5) { tl.textContent = '看到这里 ' + fmtT(ep.pos); }
+      else { tl.textContent = ep.no > 0 ? ('第 ' + ep.no + ' 集') : (ep.title || ''); }
+      d.appendChild(no);
+      d.appendChild(tl);
+      d.__ep = ep;
+      d.__group = g;
+      eg.appendChild(d);
+      nodes.push(d);
+    }
+    sections.push({ nodes: nodes, cols: EP_COLS, kind: 'ep' });
+
+    si = 1; r = 0; c = 0;
+    var fi = (typeof focusIdx === 'number' && focusIdx >= 0) ? focusIdx : -1;
+    if (fi >= 0 && fi < nodes.length) {
+      r = Math.floor(fi / EP_COLS);
+      c = fi % EP_COLS;
+    }
+    syncRoot();
+    paint();
+  }
+
+  function goHome() {
+    renderHome(false);
+    syncRoot();
+  }
+
+  // ---------------- 焦点 ----------------
+  function clearFocus() {
+    var all = document.querySelectorAll('.focus');
+    for (var i = 0; i < all.length; i++) {
+      all[i].className = all[i].className.replace(/(^|\s)focus(\s|$)/g, ' ').replace(/\s+/g, ' ').replace(/^\s|\s$/g, '');
+    }
+  }
+
+  function paint() {
+    clearFocus();
+    var sec = sections[si];
+    if (!sec || !sec.nodes.length) { return; }
+    var cols = sec.cols || 1;
+    var idx = r * cols + c;
+    if (idx < 0) { idx = 0; }
+    if (idx >= sec.nodes.length) { idx = sec.nodes.length - 1; }
+    var node = sec.nodes[idx];
+    if (!node) { return; }
+    if (sec.kind === 'card' && node.__group) {
+      lastCard = node.__group;     // 记住它是给「置顶」按钮用的
+      paintPinBtn();
+    }
+    node.className = node.className + ' focus';
+    showDetail(node, sec);
+    if (sec.kind === 'pin') { return; }   // 底栏一直在屏幕上，不用滚
+    try { node.scrollIntoView({ block: 'nearest' }); }
+    catch (e) { try { node.scrollIntoView(false); } catch (e2) {} }
+  }
+
+  function showDetail(node, sec) {
+    var n = $('detName'), m = $('detMeta');
+    if (sec.kind === 'tab') {
+      var t = node.getAttribute('data-tab');
+      if (t === 'refresh') {
+        n.textContent = '刷新列表';
+        m.textContent = '重新扫描手机上的文件，新传进来的片子会出现';
+        return;
+      }
+      n.textContent = t === 'all' ? '全部影片' : (t === 'shows' ? '剧集' : '影片与散片');
+      m.textContent = (data.shows || []).length + ' 部剧 · ' + (data.singles || []).length + ' 个单片';
+      return;
+    }
+    if (sec.kind === 'back') {
+      n.textContent = '返回';
+      m.textContent = '回到全部影片';
+      return;
+    }
+    if (sec.kind === 'pin') {
+      var pg = lastCard;
+      n.textContent = pg ? ((isPinned(pg) ? '取消置顶 · ' : '置顶 · ') + (pg.name || '')) : '置顶';
+      m.textContent = pg
+        ? (isPinned(pg) ? '按 OK 把它放回普通位置' : '按 OK 把它排到片单最前面')
+        : '先把光标移到要置顶的影片上';
+      return;
+    }
+    if (sec.kind === 'ep') {
+      var ep = node.__ep, g = node.__group;
+      n.textContent = (g.name || '') + (ep.no > 0 ? ' · 第 ' + ep.no + ' 集' : '');
+      var bits = [];
+      if (ep.size_text) { bits.push(ep.size_text); }
+      if (ep.dur > 0) { bits.push('时长 ' + fmtT(ep.dur)); }
+      if (ep.pos > 5) { bits.push('上次看到 ' + fmtT(ep.pos)); }
+      if (ep.done) { bits.push('已看完'); }
+      m.textContent = bits.join(' · ');
+      return;
+    }
+    var grp = node.__group;
+    if (!grp) { return; }
+    if (node.__ep) {
+      n.textContent = (grp.name || '') + (node.__ep.no > 0 ? ' · 第 ' + node.__ep.no + ' 集' : '');
+      m.textContent = subText(grp, node.__ep);
+      return;
+    }
+    n.textContent = grp.name || '未命名';
+    m.textContent = subText(grp, null) + (grp.dir ? (' · ' + grp.dir) : '');
+  }
+
+  function move(dx, dy) {
+    var sec = sections[si];
+    if (!sec || !sec.nodes.length) { return; }
+    var cols = sec.cols || 1;
+    var n = sec.nodes.length;
+    var rows = Math.max(1, Math.ceil(n / cols));
+
+    if (dx !== 0) {
+      var nc = c + dx;
+      if (nc >= 0 && nc < cols && (r * cols + nc) < n) { c = nc; paint(); }
+      return;
+    }
+
+    var nr = r + dy;
+    if (nr >= 0 && nr < rows && (nr * cols + c) < n) { r = nr; paint(); return; }
+
+    if (dy > 0) {
+      if (si < sections.length - 1) {
+        si++;
+        r = 0;
+        var s2 = sections[si];
+        var c2 = s2.cols || 1;
+        c = Math.min(c, c2 - 1);
+        if (c >= s2.nodes.length) { c = 0; }
+        paint();
+      }
+    } else {
+      if (si > 0) {
+        si--;
+        var s3 = sections[si];
+        var c3 = s3.cols || 1;
+        var rows3 = Math.max(1, Math.ceil(s3.nodes.length / c3));
+        r = rows3 - 1;
+        c = Math.min(c, c3 - 1);
+        if ((r * c3 + c) >= s3.nodes.length) {
+          c = Math.max(0, s3.nodes.length - 1 - r * c3);
+        }
+        paint();
+      }
+    }
+  }
+
+  // ---------------- 播放 ----------------
+  function play(g, ep) {
+    if (!ep || !ep.path) { return; }
+    var t = g.name || '';
+    if (g.count > 1 && ep.no > 0) { t = t + ' · 第 ' + ep.no + ' 集'; }
+    // 投影仪外壳看到 /play?path= 就拦下来，拼成 /media/<path> 交给内置 libVLC
+    location.href = '/play?path=' + encodeURIComponent(ep.path) + '&title=' + encodeURIComponent(t);
+  }
+
+  function activate() {
+    var sec = sections[si];
+    if (!sec || !sec.nodes.length) { return; }
+    var idx = r * (sec.cols || 1) + c;
+    var node = sec.nodes[idx];
+    if (!node) { return; }
+
+    if (sec.kind === 'tab') {
+      var which = node.getAttribute('data-tab');
+      if (which === 'refresh') { doRefresh(); return; }
+      setTab(which);
+      return;
+    }
+    if (sec.kind === 'back') { goHome(); return; }
+    if (sec.kind === 'pin') { togglePin(lastCard, true); return; }
+    if (sec.kind === 'ep') { play(node.__group, node.__ep); return; }
+
+    var g = node.__group;
+    if (!g) { return; }
+    if (node.__ep) { play(g, node.__ep); return; }          // 继续观看：直接续播
+    if (g.count === 1 && g.eps && g.eps[0]) { play(g, g.eps[0]); return; }  // 单片不用进选集页
+    renderShow(g, g.curIdx);
+  }
+
+  function setTab(t) {
+    if (tab === t) { return; }
+    tab = t;
+    renderHome(true);
+  }
+
+  // 手机上刚传进来新片、电视这边还看不到时按这个。
+  // 服务端是后台重扫、立刻返回旧数据，所以隔两秒再取一次列表。
+  function doRefresh() {
+    $('detName').textContent = '正在重新扫描手机上的文件…';
+    $('detMeta').textContent = '新传的片子要两秒后才会出现';
+    var x = new XMLHttpRequest();
+    x.open('GET', '/api/tv?rescan=1&t=' + (new Date().getTime()), true);
+    x.timeout = 10000;
+    x.onload = function () { setTimeout(load, 2000); };
+    x.onerror = function () { setTimeout(load, 2000); };
+    x.ontimeout = function () { setTimeout(load, 2000); };
+    x.send();
+  }
+
+  // 投影仪外壳的返回键会调这个：返回 true 表示"我自己回上一级了"
+  window.__tvGoUp = function () {
+    if (view === 'show') { goHome(); return true; }
+    return false;
+  };
+
+  /**
+   * 外壳每次回到前台都会调一次（从播放页退回来也是这条路）。
+   * 必须重新拉一次 /api/tv：播放页刚把进度写进手机，不刷新的话
+   * 「继续观看」永远是打开电视时那份旧数据 —— 看起来就像没做这个功能。
+   */
+  window.__tvFocus = function () {
+    if (!loaded) { return; }
+    var now = new Date().getTime();
+    if (now - lastLoadTs < 1200) { return; }
+    lastLoadTs = now;
+    var x = new XMLHttpRequest();
+    x.open('GET', '/api/tv?t=' + now, true);
+    x.timeout = 20000;
+    x.onload = function () {
+      if (x.status !== 200) { return; }          // 静默失败，别把已显示好的界面换掉
+      var d = null;
+      try { d = JSON.parse(x.responseText); } catch (e) { d = null; }
+      if (!d || !d.shows) { return; }
+      data = d;
+      loaded = true;
+      renderHome(false);      // 回到首页并把焦点给「继续观看」
+      syncRoot();
+    };
+    x.send();
+  };
+
+  function syncRoot() {
+    try {
+      if (window.TVBridge && window.TVBridge.setAtRoot) {
+        window.TVBridge.setAtRoot(view === 'home');
+      }
+    } catch (e) {}
+  }
+
+  // ---------------- 数据 ----------------
+  function fail() {
+    loaded = false;
+    setEmpty('连不上手机了',
+      '确认手机上的简传还在运行、还在同一个 WiFi<br>下拉或按这里重试');
+    $('detName').textContent = '连接断开';
+    $('detMeta').textContent = '';
+    var e = $('emptyState');
+    e.onclick = function () { load(); };
+  }
+
+  function load() {
+    lastLoadTs = new Date().getTime();
+    var x = new XMLHttpRequest();
+    x.open('GET', '/api/tv?t=' + lastLoadTs, true);
+    x.timeout = 20000;
+    x.onload = function () {
+      if (x.status !== 200) { fail(); return; }
+      var d = null;
+      try { d = JSON.parse(x.responseText); } catch (err) { d = null; }
+      if (!d || !d.shows) { fail(); return; }
+      data = d;
+      loaded = true;
+      renderHome(false);
+      syncRoot();
+    };
+    x.onerror = fail;
+    x.ontimeout = fail;
+    x.send();
+  }
+
+  // ---------------- 心跳与时钟 ----------------
+  function ping() {
+    var x = new XMLHttpRequest();
+    x.open('GET', '/api/alive?t=' + (new Date().getTime()), true);
+    x.timeout = 6000;
+    x.onload = function () { $('dot').className = (x.status === 200 ? '' : 'off'); };
+    x.onerror = function () { $('dot').className = 'off'; };
+    x.ontimeout = function () { $('dot').className = 'off'; };
+    x.send();
+  }
+
+  function tick() {
+    var d = new Date();
+    var h = d.getHours(), m = d.getMinutes();
+    $('time').textContent = (h < 10 ? '0' : '') + h + ':' + (m < 10 ? '0' : '') + m;
+  }
+
+  // ---------------- 键盘 / 遥控器 ----------------
+  document.addEventListener('keydown', function (e) {
+    var k = e.keyCode;
+    if (k === 37) { move(-1, 0); e.preventDefault(); }
+    else if (k === 39) { move(1, 0); e.preventDefault(); }
+    else if (k === 38) { move(0, -1); e.preventDefault(); }
+    else if (k === 40) { move(0, 1); e.preventDefault(); }
+    else if (k === 13 || k === 23) { activate(); e.preventDefault(); }
+    else if (k === 82) {
+      // 遥控器上的「菜单」键 = 置顶/取消置顶当前这张卡
+      if (view === 'home' && lastCard) { togglePin(lastCard, false); e.preventDefault(); }
+    }
+    else if (k === 8 || k === 27) {
+      if (view === 'show') { goHome(); e.preventDefault(); }
+    }
+  }, false);
+
+  // 老式遥控器只发 keydown 的时候，点击也能用（空鼠、触屏投影仪）
+  document.addEventListener('click', function (e) {
+    var t = e.target;
+    while (t && t !== document.body) {
+      if (t.className && ('' + t.className).indexOf('tab') === 0) {
+        var wt = t.getAttribute('data-tab');
+        if (wt === 'refresh') { doRefresh(); } else { setTab(wt); }
+        return;
+      }
+      if (t.id === 'btnBack') { goHome(); return; }
+      if (t.id === 'btnPin') { togglePin(lastCard, false); return; }
+      if (t.__ep) { play(t.__group, t.__ep); return; }
+      if (t.__group) {
+        var g = t.__group;
+        if (g.count === 1 && g.eps && g.eps[0]) { play(g, g.eps[0]); }
+        else { renderShow(g, g.curIdx); }
+        return;
+      }
+      t = t.parentNode;
+    }
+  }, false);
+
+  // 从播放页回来（WebView 还在后台）时，部分内核只会发 visibilitychange
+  document.addEventListener('visibilitychange', function () {
+    if (!document.hidden) {
+      try { if (window.__tvFocus) { window.__tvFocus(); } } catch (e) {}
+    }
+  }, false);
+
+  pins = loadPins();
+  load();
+  syncRoot();
+  tick();
+  setInterval(tick, 20000);
+  ping();
+  setInterval(ping, 15000);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 图标胶囊的图标颜色：选中时跟填充反着来（白），未选中用次要文字色。
+     运行时切主题会在代码里覆盖（setCompoundDrawableTintList）。 -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_checked="true" android:color="#FFFFFF" />
+    <item android:color="#51667A" />
+</selector>

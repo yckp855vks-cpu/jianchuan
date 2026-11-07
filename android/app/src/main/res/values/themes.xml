@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.Jianchuan" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="android:statusBarColor">#0d1a26</item>
+        <item name="android:windowBackground">#0d1a26</item>
+    </style>
+
+    <!-- 播放器：全黑、无标题栏、可以压到刘海下面铺满整块屏幕 -->
+    <style name="Theme.Jianchuan.Player" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="android:statusBarColor">#00000000</item>
+        <item name="android:navigationBarColor">#00000000</item>
+        <item name="android:windowBackground">#000000</item>
+        <item name="android:windowTranslucentStatus">true</item>
+        <item name="android:windowTranslucentNavigation">true</item>
+    </style>
+
+    <!-- 播放器里的小胶囊按钮。文字按钮比图标按钮好认，也不用再补一套图标 -->
+    <style name="PlayerPill">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">30dp</item>
+        <item name="android:layout_marginStart">5dp</item>
+        <item name="android:background">@drawable/player_pill</item>
+        <item name="android:gravity">center</item>
+        <item name="android:minWidth">44dp</item>
+        <item name="android:paddingStart">11dp</item>
+        <item name="android:paddingEnd">11dp</item>
+        <item name="android:textColor">#FFFFFF</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+    </style>
+</resources>

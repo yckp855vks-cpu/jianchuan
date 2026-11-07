@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 主题：调色板 -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="16dp"
+    android:height="16dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:pathData="M12,3.2 a8.8,8.8 0 0 0 0,17.6 h1.5 a2.1,2.1 0 0 0 0,-4.2 h-0.8 a2.1,2.1 0 0 1 0,-4.2 H16.2 a4.6,4.6 0 0 0 4.6,-4.6 A8.8,8.8 0 0 0 12,3.2 z"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="1.7"
+        android:fillColor="#00000000" />
+    <path
+        android:pathData="M8.4,9.6 m-1.25,0 a1.25,1.25 0 1 0 2.5,0 a1.25,1.25 0 1 0 -2.5,0"
+        android:fillColor="#FFFFFF" />
+    <path
+        android:pathData="M7.4,14 m-1.25,0 a1.25,1.25 0 1 0 2.5,0 a1.25,1.25 0 1 0 -2.5,0"
+        android:fillColor="#FFFFFF" />
+    <path
+        android:pathData="M11.4,7.4 m-1.25,0 a1.25,1.25 0 1 0 2.5,0 a1.25,1.25 0 1 0 -2.5,0"
+        android:fillColor="#FFFFFF" />
+</vector>

@@ -1,0 +1,52 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'com.gathin.tvplayer'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId 'com.gathin.tvplayer'
+        minSdk 21
+        targetSdk 28
+        versionCode 12
+        versionName '1.10.1'
+        // 投影仪是 32 位 ARM（armeabi-v7a），只留这一份，别把 APK 撑成几百兆
+        ndk {
+            abiFilters 'armeabi-v7a'
+        }
+    }
+
+    buildTypes {
+        release {
+            // 侧载用 debug 签名；关掉 R8，避免反射/Extractor 被裁掉
+            minifyEnabled false
+            signingConfig signingConfigs.debug
+        }
+    }
+
+    packagingOptions {
+        resources {
+            excludes += ['META-INF/*.version', 'DebugProbesKt.bin', 'META-INF/DEPENDENCIES']
+        }
+    }
+
+    // targetSdk 28 是刻意选的（避开 API 29+ 的权限/后台限制），
+    // lintVital 的 ExpiredTargetSdkVersion 在这里没有意义，直接关掉。
+    lint {
+        checkReleaseBuilds false
+        abortOnError false
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}
+
+dependencies {
+    // 播放内核用 libVLC（自带 FFmpeg 软解）。这台投影仪的 MediaCodec 硬解是坏的，
+    // ExoPlayer 播 1080p H.264 直接抛 MediaCodecVideoDecoderException。
+    implementation 'org.videolan.android:libvlc-all:3.6.0'
+}

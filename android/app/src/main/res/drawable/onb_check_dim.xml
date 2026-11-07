@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 勾变淡：点过跳转但检测不到真实状态（如自启动），只标记已处理 -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="oval">
+    <solid android:color="#66C9AEEB" />
+    <size android:width="22dp" android:height="22dp" />
+</shape>

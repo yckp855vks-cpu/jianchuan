@@ -1,0 +1,45 @@
+# ---- Python ----
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# ---- 运行数据（都在本机，不入库）----
+data/
+mediashare/data/
+mediashare/progress.json
+mediashare/.subcache/
+mediashare/.thumbs/
+mediashare/手机上传/
+mediashare/config.json
+pc/data/
+*.part
+*.tmp
+
+# ---- 构建产物 ----
+build/
+dist/
+dist312/
+.pyi_build*/
+.pyi_dist*/
+.pyi_s*/
+.gradle/
+local.properties
+*.apk
+*.aab
+*.exe
+*.zip
+*.jks
+*.keystore
+
+# ---- 日志 ----
+*.log
+
+# ---- 编辑器 / 系统 ----
+.idea/
+.vscode/
+*.iml
+.DS_Store
+Thumbs.db
+desktop.ini

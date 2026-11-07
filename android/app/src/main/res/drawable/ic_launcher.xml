@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 简传 Lite 图标：与电脑端网页 logo 完全一致 —— 品牌蓝圆角方块 + 白色纸飞机（发送/传输）。
+     纸飞机路径沿用 index.html 里的 d="M3.4 12.3 20.6 4l-4.9 15.6-4.3-6.1-8 .9 3.6-3.4-.7-3.7z"
+     （24 视口），这里整体放大 4.5 倍映射到 108 视口，保证两端图形同源、缩放后不走形。 -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- 背景：品牌蓝圆角方块 -->
+    <path android:pathData="M24,0 L84,0 A24,24 0 0 1 108,24 L108,84 A24,24 0 0 1 84,108 L24,108 A24,24 0 0 1 0,84 L0,24 A24,24 0 0 1 24,0 Z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:type="linear"
+                android:startX="16"
+                android:startY="6"
+                android:endX="92"
+                android:endY="102">
+                <item android:offset="0.0" android:color="#3F77F2" />
+                <item android:offset="0.55" android:color="#3668E8" />
+                <item android:offset="1.0" android:color="#2C53CC" />
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- 纸飞机（电脑端同款图形，24 → 108 等比放大 4.5 倍） -->
+    <path
+        android:pathData="M15.3,55.35 L92.7,18 L70.65,88.2 L51.3,60.75 L15.3,64.8 L31.5,49.5 L28.35,32.85 Z"
+        android:fillColor="#FFFFFF" />
+
+    <!-- 机翼折线，避免纯白一片看不出纸飞机结构 -->
+    <path
+        android:pathData="M92.7,18 L51.3,60.75 L70.65,88.2"
+        android:strokeColor="#D9E4FF"
+        android:strokeWidth="1.6"
+        android:strokeLineJoin="round"
+        android:fillColor="#00000000" />
+</vector>

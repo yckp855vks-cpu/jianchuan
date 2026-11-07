@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 原生界面的初始配色 = 晨雾（首次安装默认）。
+     五套主题的运行时换色在 MainActivity.ThemePalette 里，这里只给 XML 一个初始值，
+     免得布局预览和启动第一帧是黑的。 -->
+<resources>
+    <color name="jc_topbar">#EBF2F8</color>
+    <color name="jc_card">#FFFFFF</color>
+    <color name="jc_card2">#F1F6FB</color>
+    <color name="jc_text">#15222E</color>
+    <color name="jc_text2">#51667A</color>
+    <color name="jc_text3">#8296A6</color>
+    <color name="jc_brand">#2F7FB8</color>
+    <color name="jc_line">#D5E2ED</color>
+    <color name="jc_ok">#12B886</color>
+    <color name="jc_input">#F4F8FC</color>
+    <color name="jc_warn">#E05252</color>
+</resources>

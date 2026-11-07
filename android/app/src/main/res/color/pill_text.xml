@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 胶囊文字颜色：选中时和填充底色反着来（白字），未选中用次要文字色。
+     运行时切主题会在 stylePill() 里再覆盖一次，保证跟当前 palette 一致。 -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_checked="true" android:color="#FFFFFF" />
+    <item android:color="#51667A" />
+</selector>

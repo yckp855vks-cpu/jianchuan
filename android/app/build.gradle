@@ -1,0 +1,57 @@
+plugins {
+    id 'com.android.application'
+    id 'org.jetbrains.kotlin.android'
+}
+
+android {
+    namespace 'com.jianchuan.app'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId "com.jianchuan.app"
+        minSdk 24
+        targetSdk 34
+        versionCode 50
+        versionName "1.15.2"
+        // 只留 arm64：libVLC 自带 4 套 ABI 的 .so，全打进去 APK 会到 100MB 以上。
+        // 这台手机和绝大多数在用的机器都是 arm64，32 位的老机器装不了新系统也放不动 4K。
+        ndk { abiFilters 'arm64-v8a' }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+        }
+    }
+
+    // 侧载用系统默认的 debug 签名（~/.android/debug.keystore），不需要自己准备 keystore
+
+    // libvlc.so 有 41MB。AGP 默认把 .so 原样存储（不压缩），APK 直接 50MB；
+    // 改成压缩打包能降到 30MB 以内，代价只是安装时多解压一次。
+    packagingOptions {
+        jniLibs {
+            useLegacyPackaging = true
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+    kotlinOptions {
+        jvmTarget = '17'
+    }
+}
+
+dependencies {
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'androidx.webkit:webkit:1.9.0'
+    implementation 'com.google.android.material:material:1.11.0'
+    implementation 'com.journeyapps:zxing-android-embedded:4.3.0'
+    implementation 'org.nanohttpd:nanohttpd:2.3.1'
+    implementation 'androidx.documentfile:documentfile:1.0.1'
+    // 原生播放器内核：MKV / 内嵌 ASS 特效字幕 / 音轨切换全靠它。
+    // 用 libVLC 而不是 ExoPlayer 的唯一原因就是 ASS：ExoPlayer 只抽文本，
+    // 字幕组做的位置和样式会全丢。
+    implementation 'org.videolan.android:libvlc-all:3.6.0'
+}

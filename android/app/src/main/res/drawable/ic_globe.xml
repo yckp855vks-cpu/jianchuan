@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 公网：地球。描边色留白，实际颜色由 drawableTint / tint 决定 -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="13dp"
+    android:height="13dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:pathData="M12,3 a9,9 0 1 0 0.01,0 z"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="1.9"
+        android:fillColor="#00000000" />
+    <path
+        android:pathData="M3,12 h18"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="1.9"
+        android:strokeLineCap="round" />
+    <path
+        android:pathData="M12,3 c2.7,2.7 2.7,15.3 0,18 M12,3 c-2.7,2.7 -2.7,15.3 0,18"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="1.9" />
+</vector>

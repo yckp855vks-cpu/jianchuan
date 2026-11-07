@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <!-- 服务端模式：传大文件要几十秒，息屏后 Doze 会掐 CPU 和 WiFi，大文件必断 -->
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <!-- Android 10 以下存文件到公共下载目录需要 -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="28" />
+    <!-- 服务端模式：读手机里的图片/音乐/视频给别人下载（Android 12 及以下用 READ_EXTERNAL_STORAGE） -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32" />
+    <!-- Android 13+ 拆成三类媒体权限 -->
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+    <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
+    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
+    <!-- Android 11+ 读文档/压缩包等非媒体文件需要「所有文件访问」权限（跳设置页授权） -->
+    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE"
+        tools:ignore="ScopedStorage" />
+    <!-- 收到 apk 点「打开」＝安装。少了这条，Android 8.0 起会**静默丢弃**安装请求：
+         startActivity 不抛异常、界面上毫无反应，看起来就像按钮坏了。
+         用户实际安装时还要在系统设置里给本应用打开「安装未知应用」。 -->
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
+
+    <!-- 后台保活前台服务：常驻通知，进程不被系统回收 -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <!-- Android 14+ 前台服务必须声明具体类型，这里用「数据传输」最贴近本应用场景 -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
+    <!-- Android 13+ 通知需要运行时权限（前台服务通知、微信通知推电脑都用） -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
+    <!-- 蓝牙剪贴板：手机当 BLE 外设（GATT Server）对外广播，电脑连上来。
+         手机侧只广播不扫描，所以不需要 BLUETOOTH_SCAN。 -->
+    <uses-permission android:name="android.permission.BLUETOOTH"
+        android:maxSdkVersion="30" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"
+        android:maxSdkVersion="30" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADVERTISE" />
+    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
+
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
+    <!-- 没有 BLE 的机器装得上，只是剪贴板同步里的蓝牙通道用不了（会自动走局域网） -->
+    <uses-feature android:name="android.hardware.bluetooth_le" android:required="false" />
+
+    <!-- Android 11+ 包可见性：点文件旁的文件夹图标要用系统文档界面打开「下载/简传Lite」，
+         不声明的话部分 ROM 上会查不到可用应用、直接抛 ActivityNotFound -->
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:mimeType="vnd.android.document/directory" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:mimeType="*/*" />
+        </intent>
+    </queries>
+
+    <application
+        android:name=".App"
+        android:allowBackup="true"
+        android:label="简传 Lite"
+        android:icon="@drawable/ic_launcher"
+        android:roundIcon="@drawable/ic_launcher"
+        android:usesCleartextTraffic="true"
+        android:theme="@style/Theme.Jianchuan">
+
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:launchMode="singleTop"
+            android:configChanges="orientation|screenSize|keyboardHidden">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <!-- 系统「分享」面板入口：相册/文件管理器里选中文件 → 分享 → 选「简传 Lite」，
+                 把文件传到电脑。SEND=单文件，SEND_MULTIPLE=多文件，mimeType=*/* 全类型都收。
+                 Android 11+ 包可见性不拦「别人分享给我」的入口（发起方已 grant URI 权限），
+                 这里不用加 <queries>。 -->
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <action android:name="android.intent.action.SEND_MULTIPLE" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="*/*" />
+            </intent-filter>
+        </activity>
+
+        <!-- 扫码页强制竖屏（zxing 默认横屏，竖着拿手机扫竖码扫不到） -->
+        <activity
+            android:name="com.journeyapps.barcodescanner.CaptureActivity"
+            android:screenOrientation="portrait"
+            android:configChanges="orientation|screenSize|keyboardHidden"
+            tools:replace="screenOrientation" />
+
+        <!-- 首次启动引导页：欢迎 → 三步授权 → 完成 -->
+        <activity
+            android:name=".OnboardingActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:configChanges="orientation|screenSize|keyboardHidden"
+            android:theme="@style/Theme.Jianchuan" />
+
+        <!-- 原生播放器：libVLC，负责 MKV / ASS 字幕 / 音轨切换。
+             configChanges 自己接，否则转屏会重建 Activity、播放从头开始 -->
+        <activity
+            android:name=".PlayerActivity"
+            android:exported="false"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout|keyboardHidden"
+            android:theme="@style/Theme.Jianchuan.Player" />
+
+        <!-- 设置页：后台与提醒 / 去广告规则 / 保活设置 -->
+        <activity
+            android:name=".SettingsActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:configChanges="orientation|screenSize|keyboardHidden"
+            android:theme="@style/Theme.Jianchuan" />
+
+        <!-- 后台保活前台服务：常驻通知 + 承载服务端传输 -->
+        <service
+            android:name=".KeepAliveService"
+            android:exported="false"
+            android:foregroundServiceType="dataSync" />
+
+        <!-- 微信通知监听：读微信通知推给电脑（只推微信、只走局域网） -->
+        <service
+            android:name=".WechatNotificationService"
+            android:exported="false"
+            android:label="简传 Lite 通知推送"
+            android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE">
+            <intent-filter>
+                <action android:name="android.service.notification.NotificationListenerService" />
+            </intent-filter>
+        </service>
+
+        <!-- 自动跳广告：无障碍服务检测「跳过/关闭」按钮自动点 -->
+        <service
+            android:name=".AdSkipService"
+            android:exported="false"
+            android:label="简传 Lite 自动跳过广告"
+            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
+            <intent-filter>
+                <action android:name="android.accessibilityservice.AccessibilityService" />
+            </intent-filter>
+            <meta-data
+                android:name="android.accessibilityservice"
+                android:resource="@xml/accessibility_service_config" />
+        </service>
+    </application>
+
+</manifest>

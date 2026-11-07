@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">简传 Lite</string>
+    <string name="accessibility_desc">自动点击开屏广告的「跳过」「关闭」按钮，帮你省去等待时间。仅在检测到广告按钮时点击，不读取或存储你的任何内容。</string>
+</resources>

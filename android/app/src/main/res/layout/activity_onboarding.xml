@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 首次启动引导页：欢迎 → 后台待命设置（单列表三步检测打勾）→ 完成。
+     晨雾玻璃拟物风格：极淡青蓝底 + 半透明白卡片 + 天蓝品牌按钮。
+     用 ViewFlipper 承载三屏，代码里控制切换。 -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/onb_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#EEF4F9">
+
+    <ViewFlipper
+        android:id="@+id/onb_flipper"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="96dp" />
+
+    <!-- 底部固定的进度点 + 按钮区 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:orientation="vertical"
+        android:paddingStart="28dp"
+        android:paddingEnd="28dp"
+        android:paddingBottom="28dp">
+
+        <!-- 进度点（3 个） -->
+        <LinearLayout
+            android:id="@+id/onb_dots"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal" />
+
+        <!-- 主按钮 -->
+        <TextView
+            android:id="@+id/onb_primary"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginTop="20dp"
+            android:background="@drawable/onb_btn_brand"
+            android:gravity="center"
+            android:text="开始设置"
+            android:textColor="#FFFFFF"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <!-- 跳过按钮（跳过整个引导，直接进主界面） -->
+        <TextView
+            android:id="@+id/onb_skip"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginTop="10dp"
+            android:gravity="center"
+            android:text="跳过引导"
+            android:textColor="#8296A6"
+            android:textSize="14sp" />
+    </LinearLayout>
+</FrameLayout>
